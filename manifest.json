@@ -1,0 +1,13 @@
+{
+  "name": "Exames Lab · EF Hospitalar",
+  "short_name": "ExamesEF",
+  "description": "Apoio à decisão clínica em exames laboratoriais para Educação Física Hospitalar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
