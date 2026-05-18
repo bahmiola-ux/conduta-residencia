@@ -1,3 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e1e1e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Residência EF">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Residência EF · SUS</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDU1brp4LdFtf0QL9gq0RtpkSexU2rG7HE",
+  authDomain: "conduta-residencia.firebaseapp.com",
+  projectId: "conduta-residencia",
+  storageBucket: "conduta-residencia.firebasestorage.app",
+  messagingSenderId: "462838216816",
+  appId: "1:462838216816:web:b488f698031f713d81dcb5"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+db.enablePersistence().catch(e=>console.log('Offline:',e.code));
+</script>
+</head>
+<body style="margin:0;padding:0">
 
 <style>
 :root {
@@ -190,7 +220,7 @@ body{font-family:var(--font-sans,'system-ui');background:var(--color-background-
 </div>
 <div id="root"><div style="text-align:center;padding:60px 20px;color:var(--color-text-tertiary)"><i class="ti ti-loader" style="font-size:24px;display:block;margin-bottom:8px"></i>Carregando...</div></div>
 <script>
-const STORAGE_KEY='ef_pac_v1';
+
 const CATS_META=[
   {id:'hemograma',name:'Hemograma',icon:'🩸',bg:'#fef2f2'},
   {id:'inflamatorio',name:'Inflamatórios',icon:'🔥',bg:'#fef3c7'},
@@ -252,11 +282,21 @@ let st={
 function uid(){return'p_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function loadPacs(){
-  try{const r=await window.storage.get(STORAGE_KEY);if(r)st.patients=JSON.parse(r.value);}catch(e){st.patients=[];}
-  render();
+function initFirestore(){
+  db.collection('patients').orderBy('criadoEm','asc').onSnapshot(snap=>{
+    st.patients=snap.docs.map(d=>({...d.data(),id:d.id}));
+    if(st.currentPac){const u=st.patients.find(p=>p.id===st.currentPac.id);if(u)st.currentPac=u;}
+    render();
+  },err=>{console.error('Firestore:',err);render();});
 }
-async function savePacs(){try{await window.storage.set(STORAGE_KEY,JSON.stringify(st.patients));}catch(e){}}
+async function savePacToDb(pac){
+  try{const{id,...data}=pac;await db.collection('patients').doc(id).set({...data,atualizadoEm:new Date().toISOString()});}
+  catch(e){console.error('Save:',e);}
+}
+async function deletePacFromDb(id){
+  try{await db.collection('patients').doc(id).delete();}
+  catch(e){console.error('Delete:',e);}
+}
 
 function calcAge(dob){
   if(!dob)return null;
@@ -554,13 +594,13 @@ function savePac(){
     const np={...f,id:uid(),entries:{},criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString()};
     st.patients.unshift(np);st.currentPac=np;
   }
-  savePacs();st.form=null;st.screen=st.currentPac?'patientView':'patients';
+  savePacToDb(st.currentPac);st.form=null;st.screen=st.currentPac?'patientView':'patients';
   st.tab='eval';st.refSc='cats';render();
 }
 function deletePac(id){
   if(!confirm('Excluir esta paciente? Esta ação não pode ser desfeita.'))return;
   st.patients=st.patients.filter(p=>p.id!==id);
-  savePacs();st.currentPac=null;st.form=null;st.screen='patients';render();
+  savePacToDb(st.currentPac);st.currentPac=null;st.form=null;st.screen='patients';render();
 }
 function openPac(id){
   const p=st.patients.find(x=>x.id===id);if(!p)return;
@@ -600,8 +640,12 @@ function syncAndSave(){
   if(!st.currentPac)return;
   const idx=st.patients.findIndex(p=>p.id===st.currentPac.id);
   if(idx>=0){st.patients[idx]=st.currentPac;st.patients[idx].atualizadoEm=new Date().toISOString();}
-  savePacs();
+  savePacToDb(st.currentPac);
 }
 
-loadPacs();
+initFirestore();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(e=>console.log("SW:",e));}
 </script>
+
+</body>
+</html>
