@@ -38,7 +38,7 @@ body{font-family:var(--font-sans,'system-ui');background:var(--color-background-
 .hdr-left {min-width: 0; flex: 1;}
 .hdr-left h1{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hdr-left p{font-size:11px;color:var(--color-text-tertiary);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.back-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:4px 6px 4px 0;font-size:18px;display:flex;align-items:center;flex-shrink:0}
+.back-btn{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-primary);padding:5px 8px;font-size:18px;display:flex;align-items:center;flex-shrink:0}
 .icon-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-primary);padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .icon-btn:hover{background:var(--color-background-secondary)}
 .icon-btn.primary{background:var(--color-background-info);color:var(--color-text-info);border-color:transparent}
@@ -291,7 +291,7 @@ function buildPatientList(){
 // Volte para isso aqui:
   return`<div class="hdr">
     <div class="hdr-row">
-      <div class="hdr-left"><h1>Pacientes</h1><p>Residência EF · SUS</p></div>
+      <div class="hdr-left"><h1>Pacientes</h1></div>
       <button class="icon-btn primary" onclick="openForm(null)"><i class="ti ti-plus" aria-hidden="true"></i> Nova</button>
     </div>
   </div>
@@ -366,12 +366,23 @@ function buildPatientView(){
   const p=st.currentPac;if(!p)return'';
   const age=calcAge(p.dataNasc);
   const sub=[age!==null?age+' anos':'',p.gestacao?'🤰 '+p.gestacao:''].filter(Boolean).join(' · ');
-  const backFn=(st.tab==='ref'&&st.refSc!=='cats')?'goBack()':'closePac()';
+  const inRefSub=(st.tab==='ref'&&st.refSc!=='cats');
+  const backFn=inRefSub?'goBack()':'closePac()';
+  let hdrTitle=esc(p.nome);
+  let hdrSub=sub;
+  if(st.tab==='ref'&&st.refSc==='catExams'&&st.refCat){
+    const cm=CATS_META.find(c=>c.id===st.refCat);
+    hdrTitle=cm?esc(cm.name):'Exames';
+    hdrSub='';
+  } else if(st.tab==='ref'&&st.refSc==='examDetail'&&st.refExam){
+    hdrTitle=esc(st.refExam.name);
+    hdrSub='';
+  }
   return`<div class="hdr">
     <div class="hdr-row">
-      <button class="back-btn" onclick="${backFn}"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
-      <div class="hdr-left"><h1>${esc(p.nome)}</h1>${sub?`<p>${esc(sub)}</p>`:''}</div>
-      <button class="icon-btn" onclick="openForm('${p.id}')"><i class="ti ti-edit" aria-hidden="true"></i> Editar</button>
+      <button class="back-btn" onclick="${backFn}">←</button>
+      <div class="hdr-left"><h1>${hdrTitle}</h1>${hdrSub?`<p>${hdrSub}</p>`:''}</div>
+      ${!inRefSub?`<button class="icon-btn" onclick="openForm('${p.id}')"><i class="ti ti-edit" aria-hidden="true"></i> Editar</button>`:''}
     </div>
     ${st.tab==='ref'&&st.refSc==='cats'||st.tab==='eval'?`<div class="search-wrap"><i class="ti ti-search si" aria-hidden="true"></i>
       <input type="text" placeholder="${st.tab==='eval'?'Buscar exame para adicionar...':'Buscar exame ou categoria...'}" value="${esc(st.q)}" oninput="setQ(this.value)" />
