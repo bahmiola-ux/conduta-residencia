@@ -36,8 +36,11 @@ body{font-family:var(--font-sans,'system-ui');background:var(--color-background-
 .hdr{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 14px 10px;position:sticky;top:0;z-index:20}
 .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hdr-left {min-width: 0; flex: 1;}
-.hdr-left h1{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-left h1{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.2px}
 .hdr-left p{font-size:11px;color:var(--color-text-tertiary);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-brand{display:flex;flex-direction:column;gap:1px}
+.hdr-brand h1{font-size:16px;font-weight:700;letter-spacing:-0.3px;background:linear-gradient(90deg,var(--color-text-info),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-brand p{font-size:11px;color:var(--color-text-tertiary)}
 .back-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:4px 6px 4px 0;font-size:18px;display:flex;align-items:center;flex-shrink:0}
 .icon-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-primary);padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .icon-btn:hover{background:var(--color-background-secondary)}
@@ -286,7 +289,7 @@ function buildPatientList(){
 // Volte para isso aqui:
   return`<div class="hdr">
     <div class="hdr-row">
-      <div class="hdr-left"><h1>Pacientes</h1><p>Educação Física· SUS</p></div>
+      <div class="hdr-brand"><h1>Exames Lab</h1><p>Educação Física Hospitalar · SUS</p></div>
       <button class="icon-btn primary" onclick="openForm(null)"><i class="ti ti-plus" aria-hidden="true"></i> Nova</button>
     </div>
   </div>
@@ -365,7 +368,7 @@ function buildPatientView(){
     <div class="hdr-row">
       <button class="back-btn" onclick="closePac()"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
       <div class="hdr-left"><h1>${esc(p.nome)}</h1>${sub?`<p>${esc(sub)}</p>`:''}</div>
-      <button class="icon-btn" onclick="openForm('${p.id}')" style="padding:6px 10px"><i class="ti ti-edit" aria-hidden="true"></i></button>
+      <button class="icon-btn" onclick="openForm('${p.id}')"><i class="ti ti-edit" aria-hidden="true"></i> Editar</button>
     </div>
     ${st.tab==='ref'&&st.refSc==='cats'||st.tab==='eval'?`<div class="search-wrap"><i class="ti ti-search si" aria-hidden="true"></i>
       <input type="text" placeholder="${st.tab==='eval'?'Buscar exame para adicionar...':'Buscar exame ou categoria...'}" value="${esc(st.q)}" oninput="setQ(this.value)" />
@@ -402,7 +405,31 @@ function buildRefCats(){
   return'<div class="cat-grid">'+CATS_WITH_EX.map(c=>`<div class="cat-card" onclick="openCat('${c.id}')"><div class="cat-icon" style="background:${c.bg}">${c.icon}</div><div class="cat-name">${esc(c.name)}</div><div class="cat-cnt">${c.exams.length} exames</div></div>`).join('')+'</div>';
 }
 function buildRefCatExams(){
-  return EX.filter(e=>e.cat===st.refCat).map(e=>examListItem(e)).join('');
+  const p=st.currentPac;
+  const entries=p?p.entries||{}:{};
+  const exams=EX.filter(e=>e.cat===st.refCat);
+  const addedHere=exams.filter(e=>entries[e.id]!==undefined).length;
+  let html=exams.map(e=>{
+    const isAdded=entries[e.id]!==undefined;
+    const cl={x:'bx',a:'ba',ok:'bok',m:'bm'}[e.ct]||'bm';
+    const lbl={x:'Contraindicado',a:'Com restrição',ok:'Indicado',m:'Verificar'}[e.ct]||'—';
+    return`<div class="eli" style="gap:8px">
+      <div onclick="openExam('${e.id}')" style="flex:1;min-width:0;cursor:pointer">
+        <div class="eli-name">${esc(e.name)}</div>
+        <div class="eli-sub">${esc(e.sub)}</div>
+      </div>
+      <span class="badge ${cl}" style="flex-shrink:0;font-size:10px">${lbl}</span>
+      <button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExamFromRef(\''+e.id+'\')"'} aria-label="Adicionar ${esc(e.name)}">
+        <i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i>
+      </button>
+    </div>`;
+  }).join('');
+  if(addedHere>0){
+    html+=`<button onclick="setTab('eval')" style="width:100%;margin-top:10px;padding:12px;border:none;border-radius:var(--border-radius-lg);background:var(--color-background-info);color:var(--color-text-info);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+      <i class="ti ti-pencil-plus" aria-hidden="true"></i> Inserir valores (${addedHere} exame${addedHere>1?'s':''}) →
+    </button>`;
+  }
+  return html;
 }
 function examListItem(e){
   const cl={x:'bx',a:'ba',ok:'bok',m:'bm'}[e.ct]||'bm';
@@ -547,6 +574,9 @@ function addExam(id){
     st.currentPac.entries[id]='';
     syncAndSave();st.q='';render();
   }
+}
+function addExamFromRef(id){
+  addExam(id);render();
 }
 function removeExam(id){
   if(!st.currentPac||!st.currentPac.entries)return;
