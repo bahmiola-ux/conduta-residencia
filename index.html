@@ -36,11 +36,8 @@ body{font-family:var(--font-sans,'system-ui');background:var(--color-background-
 .hdr{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 14px 10px;position:sticky;top:0;z-index:20}
 .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hdr-left {min-width: 0; flex: 1;}
-.hdr-left h1{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.2px}
+.hdr-left h1{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hdr-left p{font-size:11px;color:var(--color-text-tertiary);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdr-brand{display:flex;flex-direction:column;gap:1px}
-.hdr-brand h1{font-size:16px;font-weight:700;letter-spacing:-0.3px;background:linear-gradient(90deg,var(--color-text-info),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hdr-brand p{font-size:11px;color:var(--color-text-tertiary)}
 .back-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:4px 6px 4px 0;font-size:18px;display:flex;align-items:center;flex-shrink:0}
 .icon-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-primary);padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:5px;white-space:nowrap}
 .icon-btn:hover{background:var(--color-background-secondary)}
@@ -186,7 +183,11 @@ body{font-family:var(--font-sans,'system-ui');background:var(--color-background-
 .pac-info-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:9px 12px;margin-bottom:12px;font-size:12px;color:var(--color-text-secondary);line-height:1.6}
 .pac-info-bar strong{color:var(--color-text-primary);font-weight:500}
 </style>
-<h2 style="text-align: center; margin: 20px 10px 0; font-size: 14px; font-weight: 500; color: var(--color-text-secondary);">Sistema de apoio à conduta com exames laboratoriais</h2>
+<div style="background:var(--color-background-primary);padding:14px 20px 10px;text-align:center;border-bottom:0.5px solid var(--color-border-tertiary)">
+  <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--color-text-info);margin-bottom:5px">🏥 Residência EF · SUS</div>
+  <div style="font-size:15px;font-weight:600;color:var(--color-text-primary);letter-spacing:-0.2px">Sistema de apoio à conduta</div>
+  <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">com exames laboratoriais</div>
+</div>
 <div id="root"><div style="text-align:center;padding:60px 20px;color:var(--color-text-tertiary)"><i class="ti ti-loader" style="font-size:24px;display:block;margin-bottom:8px"></i>Carregando...</div></div>
 <script>
 const STORAGE_KEY='ef_pac_v1';
@@ -244,7 +245,8 @@ let st={
   form:null,
   tab:'ref',
   refSc:'cats',refCat:null,refExam:null,
-  accOpen:null,q:''
+  accOpen:null,q:'',
+  evalMode:'select'
 };
 
 function uid(){return'p_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);}
@@ -289,7 +291,7 @@ function buildPatientList(){
 // Volte para isso aqui:
   return`<div class="hdr">
     <div class="hdr-row">
-      <div class="hdr-brand"><h1>Exames Lab</h1><p>Educação Física Hospitalar · SUS</p></div>
+      <div class="hdr-left"><h1>Pacientes</h1><p>Residência EF · SUS</p></div>
       <button class="icon-btn primary" onclick="openForm(null)"><i class="ti ti-plus" aria-hidden="true"></i> Nova</button>
     </div>
   </div>
@@ -364,9 +366,10 @@ function buildPatientView(){
   const p=st.currentPac;if(!p)return'';
   const age=calcAge(p.dataNasc);
   const sub=[age!==null?age+' anos':'',p.gestacao?'🤰 '+p.gestacao:''].filter(Boolean).join(' · ');
+  const backFn=(st.tab==='ref'&&st.refSc!=='cats')?'goBack()':'closePac()';
   return`<div class="hdr">
     <div class="hdr-row">
-      <button class="back-btn" onclick="closePac()"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+      <button class="back-btn" onclick="${backFn}"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
       <div class="hdr-left"><h1>${esc(p.nome)}</h1>${sub?`<p>${esc(sub)}</p>`:''}</div>
       <button class="icon-btn" onclick="openForm('${p.id}')"><i class="ti ti-edit" aria-hidden="true"></i> Editar</button>
     </div>
@@ -405,31 +408,7 @@ function buildRefCats(){
   return'<div class="cat-grid">'+CATS_WITH_EX.map(c=>`<div class="cat-card" onclick="openCat('${c.id}')"><div class="cat-icon" style="background:${c.bg}">${c.icon}</div><div class="cat-name">${esc(c.name)}</div><div class="cat-cnt">${c.exams.length} exames</div></div>`).join('')+'</div>';
 }
 function buildRefCatExams(){
-  const p=st.currentPac;
-  const entries=p?p.entries||{}:{};
-  const exams=EX.filter(e=>e.cat===st.refCat);
-  const addedHere=exams.filter(e=>entries[e.id]!==undefined).length;
-  let html=exams.map(e=>{
-    const isAdded=entries[e.id]!==undefined;
-    const cl={x:'bx',a:'ba',ok:'bok',m:'bm'}[e.ct]||'bm';
-    const lbl={x:'Contraindicado',a:'Com restrição',ok:'Indicado',m:'Verificar'}[e.ct]||'—';
-    return`<div class="eli" style="gap:8px">
-      <div onclick="openExam('${e.id}')" style="flex:1;min-width:0;cursor:pointer">
-        <div class="eli-name">${esc(e.name)}</div>
-        <div class="eli-sub">${esc(e.sub)}</div>
-      </div>
-      <span class="badge ${cl}" style="flex-shrink:0;font-size:10px">${lbl}</span>
-      <button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExamFromRef(\''+e.id+'\')"'} aria-label="Adicionar ${esc(e.name)}">
-        <i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i>
-      </button>
-    </div>`;
-  }).join('');
-  if(addedHere>0){
-    html+=`<button onclick="setTab('eval')" style="width:100%;margin-top:10px;padding:12px;border:none;border-radius:var(--border-radius-lg);background:var(--color-background-info);color:var(--color-text-info);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-      <i class="ti ti-pencil-plus" aria-hidden="true"></i> Inserir valores (${addedHere} exame${addedHere>1?'s':''}) →
-    </button>`;
-  }
-  return html;
+  return EX.filter(e=>e.cat===st.refCat).map(e=>examListItem(e)).join('');
 }
 function examListItem(e){
   const cl={x:'bx',a:'ba',ok:'bok',m:'bm'}[e.ct]||'bm';
@@ -455,32 +434,52 @@ function buildExamDetail(p){
 function buildEvalTab(p){
   const sex=p.sexo||'F';const entries=p.entries||{};
   const added=EX.filter(e=>entries[e.id]!==undefined);
-  let html='';
-  if(p.diagnostico){
-    html+=`<div class="pac-info-bar"><strong>${esc(p.nome)}</strong>${calcAge(p.dataNasc)?' · '+calcAge(p.dataNasc)+' anos':''}${p.gestacao?' · 🤰 '+p.gestacao:''}<br><span style="color:var(--color-text-tertiary)">${esc(p.diagnostico.split('\n')[0])}</span></div>`;
-  }
-  if(st.q.trim()){
-    const q=st.q.toLowerCase();
-    const res=EX.filter(e=>e.name.toLowerCase().includes(q)||e.abbr.toLowerCase().includes(q));
-    if(!res.length){html+=`<div class="empty" style="padding:28px 0"><i class="ti ti-search" aria-hidden="true"></i>Nenhum resultado</div>`;}
-    else{
-      html+=`<div style="font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px">Toque em + para adicionar</div>`;
-      res.forEach(e=>{const isAdded=entries[e.id]!==undefined;html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:7px"><div><div style="font-size:13px;font-weight:500">${esc(e.name)}</div><div style="font-size:11px;color:var(--color-text-tertiary)">${esc(CATS_META.find(c=>c.id===e.cat)?.name||e.cat)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i></button></div>`;});
+  const nAdded=added.length;
+
+  // ── barra de modo ────────────────────────────────────────────────────────
+  const modeBar=`<div style="display:flex;gap:6px;margin-bottom:14px">
+    <button onclick="setEvalMode('select')" style="flex:1;padding:8px;border:1.5px solid ${st.evalMode==='select'?'var(--color-text-info)':'var(--color-border-secondary)'};border-radius:var(--border-radius-md);background:${st.evalMode==='select'?'var(--color-background-info)':'var(--color-background-secondary)'};color:${st.evalMode==='select'?'var(--color-text-info)':'var(--color-text-secondary)'};font-size:12px;font-weight:${st.evalMode==='select'?'600':'400'};cursor:pointer;font-family:inherit">
+      <i class="ti ti-checkbox" style="margin-right:4px"></i>Selecionar exames${nAdded?' ('+nAdded+')':''}
+    </button>
+    <button onclick="setEvalMode('fill')" style="flex:1;padding:8px;border:1.5px solid ${st.evalMode==='fill'?'var(--color-text-info)':'var(--color-border-secondary)'};border-radius:var(--border-radius-md);background:${st.evalMode==='fill'?'var(--color-background-info)':'var(--color-background-secondary)'};color:${st.evalMode==='fill'?'var(--color-text-info)':'var(--color-text-secondary)'};font-size:12px;font-weight:${st.evalMode==='fill'?'600':'400'};cursor:pointer;font-family:inherit;opacity:${nAdded?'1':'0.4'}" ${!nAdded?'disabled':''}>
+      <i class="ti ti-pencil" style="margin-right:4px"></i>Inserir valores
+    </button>
+  </div>`;
+
+  // ── modo SELECIONAR ──────────────────────────────────────────────────────
+  if(st.evalMode==='select'){
+    let html=modeBar;
+    if(p.diagnostico||p.gestacao){html+=`<div class="pac-info-bar"><strong>${esc(p.nome)}</strong>${calcAge(p.dataNasc)?' · '+calcAge(p.dataNasc)+' anos':''}${p.gestacao?' · 🤰 '+p.gestacao:''}</div>`;}
+    if(st.q.trim()){
+      const q=st.q.toLowerCase();
+      const res=EX.filter(e=>e.name.toLowerCase().includes(q)||e.abbr.toLowerCase().includes(q));
+      if(!res.length){html+=`<div class="empty" style="padding:28px 0"><i class="ti ti-search" aria-hidden="true"></i>Nenhum resultado</div>`;}
+      else{res.forEach(e=>{const isAdded=entries[e.id]!==undefined;html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:7px"><div><div style="font-size:13px;font-weight:500">${esc(e.name)}</div><div style="font-size:11px;color:var(--color-text-tertiary)">${esc(CATS_META.find(c=>c.id===e.cat)?.name||e.cat)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i></button></div>`;});}
+      return html;
     }
-    if(added.length)html+=`<div style="margin-top:10px"><div class="sec-hdr">Inseridos (${added.length})</div>${added.map(e=>buildExCard(e,entries,sex)).join('')}</div>`;
+    CATS_WITH_EX.forEach(c=>{
+      const isOpen=st.accOpen===c.id;
+      const catAdded=c.exams.filter(e=>entries[e.id]!==undefined).length;
+      html+=`<div class="acc-cat"><div class="acc-hdr" onclick="toggleAcc('${c.id}')">
+        <div class="acc-title">${c.icon} ${esc(c.name)} <span class="acc-cnt">${c.exams.length} exames${catAdded?' · '+catAdded+' ✓':''}</span></div>
+        <i class="ti ti-chevron-down acc-chev ${isOpen?'open':''}" aria-hidden="true"></i></div>
+        ${isOpen?`<div class="acc-body">${c.exams.map(e=>{const isAdded=entries[e.id]!==undefined;return`<div class="aer"><div><div class="aer-name">${esc(e.name)}</div><div class="aer-unit">${esc(e.unit)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i></button></div>`;}).join('')}</div>`:''}</div>`;
+    });
+    if(nAdded){
+      html+=`<button onclick="setEvalMode('fill')" style="width:100%;margin-top:10px;padding:13px;border:none;border-radius:var(--border-radius-lg);background:var(--color-background-info);color:var(--color-text-info);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit">
+        <i class="ti ti-pencil-plus" aria-hidden="true"></i> Inserir valores para ${nAdded} exame${nAdded>1?'s':''} →
+      </button>`;
+    }
     return html;
   }
-  if(added.length){html+=`<div class="eval-added-section"><div class="sec-hdr">Exames inseridos (${added.length}) <span style="font-size:11px;color:var(--color-text-info);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0" onclick="setTab('conduta')">Ver conduta →</span></div>${added.map(e=>buildExCard(e,entries,sex)).join('')}</div>`;}
-  html+=`<div class="sec-hdr" style="margin-top:${added.length?'4px':'0'}">Adicionar exames</div>`;
-  CATS_WITH_EX.forEach(c=>{
-    const isOpen=st.accOpen===c.id;
-    const catAdded=c.exams.filter(e=>entries[e.id]!==undefined).length;
-    html+=`<div class="acc-cat"><div class="acc-hdr" onclick="toggleAcc('${c.id}')"><div class="acc-title">${c.icon} ${esc(c.name)} <span class="acc-cnt">${c.exams.length} exames${catAdded?' · '+catAdded+' ✓':''}</span></div><i class="ti ti-chevron-down acc-chev ${isOpen?'open':''}" aria-hidden="true"></i></div>
-    ${isOpen?`<div class="acc-body">${c.exams.map(e=>{const isAdded=entries[e.id]!==undefined;return`<div class="aer"><div><div class="aer-name">${esc(e.name)}</div><div class="aer-unit">${esc(e.unit)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i></button></div>`;}).join('')}</div>`:''}</div>`;
-  });
+
+  // ── modo INSERIR VALORES ─────────────────────────────────────────────────
+  let html=modeBar;
+  if(!nAdded)return html+`<div class="empty"><i class="ti ti-checkbox" aria-hidden="true"></i><p>Nenhum exame selecionado.</p><p style="margin-top:8px;font-size:12px">Volte à aba Selecionar.</p></div>`;
+  if(p.diagnostico||p.gestacao){html+=`<div class="pac-info-bar"><strong>${esc(p.nome)}</strong>${calcAge(p.dataNasc)?' · '+calcAge(p.dataNasc)+' anos':''}${p.gestacao?' · 🤰 '+p.gestacao:''}</div>`;}
+  added.forEach(e=>{html+=buildExCard(e,entries,sex);});
   return html;
 }
-
 function buildExCard(e,entries,sex){
   const val=entries[e.id]||'';const res=val!==''?evExam(e,val,sex):null;const c=res?res.c:'';
   let inputHtml;
@@ -557,7 +556,8 @@ function openPac(id){
   st.currentPac=p;st.screen='patientView';st.tab='eval';st.refSc='cats';st.q='';st.accOpen=null;render();
 }
 function closePac(){st.screen='patients';st.currentPac=null;st.q='';render();}
-function setTab(t){st.tab=t;if(t!=='ref')st.q='';if(t==='eval')st.accOpen=null;render();}
+function setTab(t){st.tab=t;if(t!=='ref')st.q='';if(t==='eval'){st.accOpen=null;if(!st.currentPac||!Object.keys(st.currentPac.entries||{}).length)st.evalMode='select';}render();}
+function setEvalMode(m){st.evalMode=m;render();}
 function setQ(v){st.q=v;render();}
 function openCat(id){st.refCat=id;st.refSc='catExams';render();}
 function openExam(id){const ex=EX.find(e=>e.id===id);if(ex){st.refExam=ex;st.refSc='examDetail';render();}}
@@ -574,9 +574,6 @@ function addExam(id){
     st.currentPac.entries[id]='';
     syncAndSave();st.q='';render();
   }
-}
-function addExamFromRef(id){
-  addExam(id);render();
 }
 function removeExam(id){
   if(!st.currentPac||!st.currentPac.entries)return;
