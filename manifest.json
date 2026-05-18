@@ -1,7 +1,7 @@
 {
-  "name": "Exames Lab · EF Hospitalar",
-  "short_name": "ExamesEF",
-  "description": "Apoio à decisão clínica em exames laboratoriais para Educação Física Hospitalar",
+  "name": "Exames Lab · Conduta EF",
+  "short_name": "Conduta EF",
+  "description": "Apoio à conduta com exames laboratoriais para Educação Física",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
