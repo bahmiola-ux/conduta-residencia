@@ -1,230 +1,193 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1e1e1e" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="ExamesEF">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.svg">
-<title>Exames Lab · EF Hospitalar</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <style>
 :root {
-  --bg: #f1f3f4;
-  --bg1: #ffffff;
-  --bg2: #f8f9fa;
-  --bgi: #e8f0fe;
-  --bgs: #e6f4ea;
-  --bgw: #fef7e0;
-  --bgd: #fce8e8;
-  --t1: #202124;
-  --t2: #5f6368;
-  --t3: #9aa0a6;
-  --ti: #1a73e8;
-  --ts: #188038;
-  --tw: #b06000;
-  --td: #c5221f;
-  --bl: rgba(0,0,0,0.1);
-  --bm: rgba(0,0,0,0.2);
-  --bs: rgba(0,0,0,0.35);
-  --bd: #c5221f;
-  --rm: 8px;
-  --rl: 12px;
+  /* Fundo escuro */
+  --color-background-primary: #1e1e1e;
+  --color-background-secondary: #2a2a2a;
+  --color-background-tertiary: #121212;
+
+  /* Textos claros */
+  --color-text-primary: #f0f0f0;
+  --color-text-secondary: #b3b3b3;
+  --color-text-tertiary: #888888;
+
+  /* Bordas sutis */
+  --color-border-primary: #555555;
+  --color-border-secondary: #404040;
+  --color-border-tertiary: #2e2e2e;
+
+  /* Cores de estado (ajustadas para leitura em fundo escuro) */
+  --color-background-info: #1a365d;
+  --color-text-info: #63b3ed;
+  --color-background-success: #1c4532;
+  --color-text-success: #68d391;
+  --color-background-warning: #744210;
+  --color-text-warning: #fbd38d;
+  --color-background-danger: #742a2a;
+  --color-text-danger: #fc8181;
+
+  /* Constantes de layout */
+  --border-radius-md: 6px;
+  --border-radius-lg: 10px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111111;
-    --bg1: #1e1e1e;
-    --bg2: #2d2d2d;
-    --bgi: #1a3560;
-    --bgs: #0d3b20;
-    --bgw: #3d2800;
-    --bgd: #3b1515;
-    --t1: #e8eaed;
-    --t2: #9aa0a6;
-    --t3: #5f6368;
-    --ti: #8ab4f8;
-    --ts: #81c995;
-    --tw: #fdd663;
-    --td: #f28b82;
-    --bl: rgba(255,255,255,0.08);
-    --bm: rgba(255,255,255,0.16);
-    --bs: rgba(255,255,255,0.28);
-  }
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t1);font-size:14px;min-height:100vh}
-#root{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.hdr{background:var(--bg1);border-bottom:0.5px solid var(--bl);padding:12px 16px 10px;position:sticky;top:0;z-index:20}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,'system-ui');background:var(--color-background-tertiary);color:var(--color-text-primary);font-size:14px}
+#root{max-width:420px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 14px 10px;position:sticky;top:0;z-index:20}
 .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.hdr-left{min-width:0;flex:1}
-.hdr-left h1{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t1)}
-.hdr-left p{font-size:11px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.back-btn{background:none;border:none;cursor:pointer;color:var(--t2);padding:4px 8px 4px 0;font-size:20px;display:flex;align-items:center;flex-shrink:0}
-.icon-btn{background:none;border:0.5px solid var(--bm);border-radius:var(--rm);cursor:pointer;color:var(--t1);padding:7px 13px;font-size:13px;display:flex;align-items:center;gap:5px;white-space:nowrap}
-.icon-btn.primary{background:var(--bgi);color:var(--ti);border-color:transparent;font-weight:500}
+.hdr-left {min-width: 0; flex: 1;}
+.hdr-left h1{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-left p{font-size:11px;color:var(--color-text-tertiary);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back-btn{background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:4px 6px 4px 0;font-size:18px;display:flex;align-items:center;flex-shrink:0}
+.icon-btn{background:none;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;color:var(--color-text-primary);padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.icon-btn:hover{background:var(--color-background-secondary)}
+.icon-btn.primary{background:var(--color-background-info);color:var(--color-text-info);border-color:transparent}
 .search-wrap{position:relative;margin-top:10px}
-.search-wrap input{width:100%;padding:9px 36px;border:0.5px solid var(--bm);border-radius:var(--rm);background:var(--bg2);color:var(--t1);font-size:13px;outline:none;font-family:inherit}
-.search-wrap input:focus{border-color:var(--ti)}
-.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:16px;pointer-events:none}
-.sc{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:14px;background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center}
-.content{flex:1;padding:12px 16px 80px}
-.nav{display:flex;background:var(--bg1);border-top:0.5px solid var(--bl);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:20}
-.nav-btn{flex:1;padding:10px 4px 14px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--t3);font-size:10px;font-family:inherit}
-.nav-btn.on{color:var(--ti)}
-.nav-btn i{font-size:22px}
-/* patients */
-.pac-card{background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:13px;transition:border-color .15s}
-.pac-card:active{background:var(--bg2)}
-.pac-av{width:42px;height:42px;border-radius:50%;background:var(--bgi);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:var(--ti);flex-shrink:0}
-.pac-nome{font-size:14px;font-weight:600;margin-bottom:2px;color:var(--t1)}
-.pac-info{font-size:12px;color:var(--t2)}
-.pac-tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
-.tag{font-size:11px;padding:2px 8px;border-radius:20px;border:0.5px solid var(--bl);color:var(--t2)}
-.tag.gest{background:var(--bgi);color:var(--ti);border-color:transparent}
-.tag.ex{font-weight:500}
-.tag.ex-ok{background:var(--bgs);color:var(--ts);border-color:transparent}
-.tag.ex-a{background:var(--bgw);color:var(--tw);border-color:transparent}
-.tag.ex-x{background:var(--bgd);color:var(--td);border-color:transparent}
-/* form */
-.form-sec{background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rl);padding:16px;margin-bottom:10px}
-.form-sec h2{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
-.field{margin-bottom:14px}
+.search-wrap input{width:100%;padding:8px 34px 8px 34px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:13px;outline:none}
+.search-wrap input:focus{border-color:var(--color-border-primary)}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--color-text-tertiary);font-size:16px}
+.sc{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--color-text-tertiary);font-size:14px;background:none;border:none;cursor:pointer}
+.content{flex:1;padding:12px 14px 70px}
+.nav{display:flex;background:var(--color-background-primary);border-top:0.5px solid var(--color-border-tertiary);position:sticky;bottom:0;z-index:10}
+.nav-btn{flex:1;padding:9px 4px 11px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--color-text-tertiary);font-size:10px}
+.nav-btn.on{color:var(--color-text-info)}
+.nav-btn i{font-size:20px}
+/* Patient list */
+.pac-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:13px 14px;margin-bottom:9px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .15s}
+.pac-card:hover{border-color:var(--color-border-primary)}
+.pac-avatar{width:40px;height:40px;border-radius:50%;background:var(--color-background-info);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:var(--color-text-info);flex-shrink:0}
+.pac-nome{font-size:14px;font-weight:500;margin-bottom:2px}
+.pac-info{font-size:12px;color:var(--color-text-secondary)}
+.pac-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.tag.gest{background:var(--color-background-info);color:var(--color-text-info);border-color:transparent}
+.tag.exames{background:var(--color-background-success);color:var(--color-text-success);border-color:transparent}
+/* Form */
+.form-section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.form-section h2{font-size:12px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px}
+.field{margin-bottom:12px}
 .field:last-child{margin-bottom:0}
-.field label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:6px}
-.field input,.field textarea{width:100%;padding:10px 12px;border:0.5px solid var(--bm);border-radius:var(--rm);background:var(--bg2);color:var(--t1);font-size:13px;outline:none;font-family:inherit;transition:border-color .15s}
-.field input:focus,.field textarea:focus{border-color:var(--ti)}
-.field textarea{resize:none;min-height:80px;line-height:1.5}
-.field-hint{font-size:11px;color:var(--t3);margin-top:5px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:9px 11px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:13px;outline:none;font-family:inherit}
+.field input:focus,.field textarea:focus{border-color:var(--color-border-primary)}
+.field textarea{resize:none;min-height:72px;line-height:1.5}
+.field-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
 .sex-wrap{display:flex;gap:6px}
-.sex-btn{flex:1;padding:9px;font-size:13px;border-radius:var(--rm);border:1.5px solid var(--bm);background:var(--bg2);color:var(--t2);cursor:pointer;font-weight:400;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;font-family:inherit}
-.sex-btn.on{border-color:var(--ti);background:var(--bgi);color:var(--ti);font-weight:600}
+.sex-btn{flex:1;padding:8px;font-size:13px;border-radius:var(--border-radius-md);border:1.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:pointer;font-weight:400;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.sex-btn.on{border-color:var(--color-text-info);background:var(--color-background-info);color:var(--color-text-info);font-weight:500}
 .sex-btn.on::before{content:'✓';font-size:12px}
-.save-btn{width:100%;padding:14px;border:none;border-radius:var(--rl);background:var(--ti);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px;font-family:inherit;transition:opacity .15s}
-.save-btn:active{opacity:.85}
-.del-btn{width:100%;padding:12px;border:0.5px solid var(--td);border-radius:var(--rl);background:transparent;color:var(--td);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-family:inherit}
-/* badges */
+.save-btn{width:100%;padding:13px;border:none;border-radius:var(--border-radius-lg);background:var(--color-background-info);color:var(--color-text-info);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
+.del-btn{width:100%;padding:11px;border:0.5px solid var(--color-border-danger);border-radius:var(--border-radius-lg);background:transparent;color:var(--color-text-danger);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+/* Exam cards (same as v3) */
 .badge{display:inline-flex;align-items:center;font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
-.bx{background:var(--bgd);color:var(--td)}
-.ba{background:var(--bgw);color:var(--tw)}
-.bok{background:var(--bgs);color:var(--ts)}
-.bm{background:var(--bgi);color:var(--ti)}
-/* cat grid */
-.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cat-card{background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rl);padding:14px 13px;cursor:pointer;transition:border-color .15s}
-.cat-card:active{background:var(--bg2)}
-.cat-icon{font-size:22px;width:38px;height:38px;border-radius:var(--rm);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
-.cat-name{font-size:12px;font-weight:600;line-height:1.3;color:var(--t1)}
-.cat-cnt{font-size:11px;color:var(--t3);margin-top:2px}
-/* exam list */
-.eli{background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rm);padding:12px 13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s}
-.eli:active{background:var(--bg2)}
-.eli-name{font-size:13px;font-weight:600;color:var(--t1)}
-.eli-sub{font-size:11px;color:var(--t3);margin-top:2px}
-/* detail */
-.det-sec{background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rl);padding:14px;margin-bottom:10px}
-.det-lbl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
-.det-val{font-size:13px;line-height:1.6;color:var(--t1)}
-.ref-box{background:var(--bg2);border-radius:var(--rm);padding:10px 12px;font-size:13px;color:var(--t2);line-height:1.5;font-family:monospace}
+.bx{background:var(--color-background-danger);color:var(--color-text-danger)}
+.ba{background:var(--color-background-warning);color:var(--color-text-warning)}
+.bok{background:var(--color-background-success);color:var(--color-text-success)}
+.bm{background:var(--color-background-info);color:var(--color-text-info)}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cat-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:13px 12px;cursor:pointer;transition:border-color .15s}
+.cat-card:hover{border-color:var(--color-border-primary)}
+.cat-icon{font-size:20px;width:36px;height:36px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;margin-bottom:7px}
+.cat-name{font-size:12px;font-weight:500;line-height:1.3}
+.cat-cnt{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.eli{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:11px 12px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s}
+.eli:hover{border-color:var(--color-border-primary)}
+.eli-name{font-size:13px;font-weight:500}
+.eli-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.det-section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:13px;margin-bottom:9px}
+.det-lbl{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.det-val{font-size:13px;line-height:1.55}
+.ref-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:9px 11px;font-size:13px;color:var(--color-text-secondary);line-height:1.5;font-family:var(--font-mono)}
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
-.chip{font-size:11px;padding:3px 8px;background:var(--bg2);border:0.5px solid var(--bl);border-radius:20px;color:var(--t2)}
-.cond-box{border-radius:var(--rm);padding:12px 14px;font-size:13px;line-height:1.55}
-.cond-box.x{background:var(--bgd);color:var(--td)}
-.cond-box.a{background:var(--bgw);color:var(--tw)}
-.cond-box.ok{background:var(--bgs);color:var(--ts)}
-.cond-box.m{background:var(--bg2);color:var(--t2)}
-.add-to-eval{width:100%;padding:13px;border:none;border-radius:var(--rl);background:var(--bgi);color:var(--ti);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:2px;font-family:inherit}
-.add-to-eval.added{background:var(--bgs);color:var(--ts);cursor:default}
-/* exam cards */
-.ex-card{background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rl);margin-bottom:10px;overflow:hidden}
-.ex-card-hd{padding:11px 13px 7px;display:flex;align-items:flex-start;justify-content:space-between}
-.ex-name{font-size:13px;font-weight:600;color:var(--t1)}
-.ex-sub{font-size:11px;color:var(--t3);margin-top:1px}
-.rm-btn{background:none;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:3px;border-radius:4px;flex-shrink:0;display:flex;align-items:center}
-.rm-btn:hover{color:var(--td)}
-.ex-inp-row{padding:0 13px 9px;display:flex;align-items:center;gap:9px}
-.ex-inp-row input{flex:1;padding:9px 11px;border:0.5px solid var(--bm);border-radius:var(--rm);font-size:16px;font-weight:600;background:var(--bg2);color:var(--t1);outline:none;font-family:monospace;transition:border-color .15s}
-.ex-inp-row input:focus{border-color:var(--ti)}
-.ex-unit{font-size:12px;color:var(--t3);min-width:36px;flex-shrink:0}
-.ex-ref{padding:0 13px 9px;font-size:11px;color:var(--t3)}
-.cstrip{padding:10px 13px;border-top:0.5px solid var(--bl)}
-.cstrip.x{background:var(--bgd)}.cstrip.a{background:var(--bgw)}.cstrip.ok{background:var(--bgs)}
-.cstrip .cst{font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;margin-bottom:3px}
-.cstrip.x .cst,.cstrip.x .ccd{color:var(--td)}
-.cstrip.a .cst,.cstrip.a .ccd{color:var(--tw)}
-.cstrip.ok .cst,.cstrip.ok .ccd{color:var(--ts)}
+.chip{font-size:11px;padding:3px 8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;color:var(--color-text-secondary)}
+.cond-box{border-radius:var(--border-radius-md);padding:11px 13px;font-size:13px;line-height:1.55}
+.cond-box.x{background:var(--color-background-danger);color:var(--color-text-danger)}
+.cond-box.a{background:var(--color-background-warning);color:var(--color-text-warning)}
+.cond-box.ok{background:var(--color-background-success);color:var(--color-text-success)}
+.cond-box.m{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.add-to-eval-btn{width:100%;padding:12px;border:none;border-radius:var(--border-radius-lg);background:var(--color-background-info);color:var(--color-text-info);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:2px}
+.add-to-eval-btn.added{background:var(--color-background-success);color:var(--color-text-success);cursor:default}
+.ex-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:9px;overflow:hidden}
+.ex-card-hd{padding:10px 12px 6px;display:flex;align-items:flex-start;justify-content:space-between}
+.ex-name{font-size:13px;font-weight:500}
+.ex-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:1px}
+.rm-btn{background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);font-size:15px;padding:2px;border-radius:4px;flex-shrink:0}
+.rm-btn:hover{color:var(--color-text-danger)}
+.ex-inp-row{padding:0 12px 8px;display:flex;align-items:center;gap:8px}
+.ex-inp-row input{flex:1;padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:15px;font-weight:500;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;font-family:var(--font-mono,'monospace')}
+.ex-inp-row input:focus{border-color:var(--color-border-primary)}
+.ex-unit{font-size:12px;color:var(--color-text-tertiary);min-width:36px}
+.ex-ref{padding:0 12px 8px;font-size:11px;color:var(--color-text-tertiary)}
+.cstrip{padding:9px 12px;border-top:0.5px solid var(--color-border-tertiary)}
+.cstrip.x{background:var(--color-background-danger)}.cstrip.a{background:var(--color-background-warning)}.cstrip.ok{background:var(--color-background-success)}
+.cstrip .cst{font-size:11px;font-weight:500;display:flex;align-items:center;gap:4px;margin-bottom:3px}
+.cstrip.x .cst,.cstrip.x .ccd{color:var(--color-text-danger)}
+.cstrip.a .cst,.cstrip.a .ccd{color:var(--color-text-warning)}
+.cstrip.ok .cst,.cstrip.ok .ccd{color:var(--color-text-success)}
 .ccd{font-size:12px;line-height:1.5}
-.ctip{padding:5px 13px 10px;font-size:11px;color:var(--t3);line-height:1.5}
-/* accordion */
-.acc-cat{background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rl);margin-bottom:8px;overflow:hidden}
-.acc-hdr{padding:13px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.acc-hdr:active{background:var(--bg2)}
-.acc-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;color:var(--t1)}
-.acc-cnt{font-size:11px;color:var(--t3);font-weight:400}
-.acc-chev{font-size:16px;color:var(--t3);transition:transform .2s}
+.tip{padding:5px 12px 9px;font-size:11px;color:var(--color-text-tertiary);line-height:1.5}
+.acc-cat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:7px;overflow:hidden}
+.acc-hdr{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.acc-hdr:hover{background:var(--color-background-secondary)}
+.acc-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.acc-cnt{font-size:11px;color:var(--color-text-tertiary);font-weight:400}
+.acc-chev{font-size:15px;color:var(--color-text-tertiary);transition:transform .2s}
 .acc-chev.open{transform:rotate(180deg)}
-.acc-body{border-top:0.5px solid var(--bl)}
-.aer{padding:10px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--bl)}
+.acc-body{border-top:0.5px solid var(--color-border-tertiary)}
+.aer{padding:9px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--color-border-tertiary)}
 .aer:last-child{border-bottom:none}
-.aer-name{font-size:13px;color:var(--t1)}.aer-unit{font-size:11px;color:var(--t3);margin-top:1px}
-.add-btn{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--bm);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ti);font-size:17px;flex-shrink:0;transition:all .15s}
-.add-btn:active{background:var(--bgi)}
-.add-btn.chk{background:var(--bgs);border-color:transparent;color:var(--ts);cursor:default}
-/* conduta */
-.sum-hero{border-radius:var(--rl);padding:18px;margin-bottom:13px;text-align:center}
-.sum-hero.ok{background:var(--bgs)}.sum-hero.a{background:var(--bgw)}.sum-hero.x{background:var(--bgd)}
-.sh-lbl{font-size:11px;font-weight:600;margin-bottom:5px}
-.sh-val{font-size:22px;font-weight:700}
-.sum-hero.ok .sh-lbl,.sum-hero.ok .sh-val{color:var(--ts)}
-.sum-hero.a .sh-lbl,.sum-hero.a .sh-val{color:var(--tw)}
-.sum-hero.x .sh-lbl,.sum-hero.x .sh-val{color:var(--td)}
-.sum-row{display:flex;gap:10px;padding:11px 13px;background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rm);margin-bottom:8px;align-items:flex-start}
+.aer-name{font-size:13px}.aer-unit{font-size:11px;color:var(--color-text-tertiary)}
+.add-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-background-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-info);
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.add-btn:hover {
+  background: var(--color-background-info);
+  border-color: var(--color-text-info);
+  color: #fff;
+}
+.add-btn.chk {
+  background: var(--color-background-success);
+  border-color: transparent;
+  color: var(--color-text-success);
+  cursor: default;
+}
+.sum-hero{border-radius:var(--border-radius-lg);padding:16px;margin-bottom:12px;text-align:center}
+.sum-hero.ok{background:var(--color-background-success)}.sum-hero.a{background:var(--color-background-warning)}.sum-hero.x{background:var(--color-background-danger)}
+.sh-lbl{font-size:11px;font-weight:500;margin-bottom:4px}.sh-val{font-size:20px;font-weight:500}
+.sum-hero.ok .sh-lbl,.sum-hero.ok .sh-val{color:var(--color-text-success)}
+.sum-hero.a .sh-lbl,.sum-hero.a .sh-val{color:var(--color-text-warning)}
+.sum-hero.x .sh-lbl,.sum-hero.x .sh-val{color:var(--color-text-danger)}
+.sum-row{display:flex;gap:9px;padding:10px 12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:7px;align-items:flex-start}
 .sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.sdot.x{background:var(--td)}.sdot.a{background:var(--tw)}.sdot.ok{background:var(--ts)}
-.sr-nm{font-size:13px;font-weight:600;margin-bottom:2px;color:var(--t1)}
-.sr-vl{font-size:11px;color:var(--t3)}
+.sdot.x{background:var(--color-text-danger)}.sdot.a{background:var(--color-text-warning)}.sdot.ok{background:var(--color-text-success)}
+.sr-nm{font-size:13px;font-weight:500;margin-bottom:2px}.sr-vl{font-size:11px;color:var(--color-text-tertiary)}
 .sr-cd{font-size:12px;margin-top:3px}
-.sr-cd.x{color:var(--td)}.sr-cd.a{color:var(--tw)}.sr-cd.ok{color:var(--ts)}
-.sr-tip{font-size:11px;color:var(--t3);margin-top:2px}
-.disc{font-size:11px;color:var(--t3);background:var(--bg2);border-radius:var(--rm);padding:11px 13px;margin-top:13px;line-height:1.6}
-/* misc */
-.empty{text-align:center;padding:50px 20px;color:var(--t3)}
-.empty i{font-size:32px;display:block;margin-bottom:10px}
-.empty p{font-size:13px;color:var(--t2);margin-top:6px}
-.sec-hdr{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.sec-hdr a{font-size:11px;color:var(--ti);font-weight:500;text-transform:none;letter-spacing:0;cursor:pointer;text-decoration:none}
-.pac-info-bar{background:var(--bg2);border-radius:var(--rm);padding:10px 13px;margin-bottom:13px;font-size:12px;color:var(--t2);line-height:1.7}
-.pac-info-bar strong{color:var(--t1);font-weight:600}
-.search-result-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--bg1);border:0.5px solid var(--bl);border-radius:var(--rm);margin-bottom:8px}
-.loading{text-align:center;padding:60px 20px;color:var(--t3)}
-.loading i{font-size:28px;display:block;margin-bottom:10px}
+.sr-cd.x{color:var(--color-text-danger)}.sr-cd.a{color:var(--color-text-warning)}.sr-cd.ok{color:var(--color-text-success)}
+.disc{font-size:11px;color:var(--color-text-tertiary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;margin-top:12px;line-height:1.5}
+.empty{text-align:center;padding:44px 16px;color:var(--color-text-tertiary)}
+.empty i{font-size:30px;display:block;margin-bottom:8px}
+.empty p{font-size:13px;margin-top:4px}
+.sec-hdr{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
+.pac-info-bar{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:9px 12px;margin-bottom:12px;font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.pac-info-bar strong{color:var(--color-text-primary);font-weight:500}
 </style>
-</head>
-<body>
-<div id="root"><div class="loading"><i class="ti ti-loader"></i>Carregando...</div></div>
-
+<h2 style="text-align: center; margin: 20px 10px 0; font-size: 14px; font-weight: 500; color: var(--color-text-secondary);">Sistema de apoio à conduta com exames laboratoriais</h2>
+<div id="root"><div style="text-align:center;padding:60px 20px;color:var(--color-text-tertiary)"><i class="ti ti-loader" style="font-size:24px;display:block;margin-bottom:8px"></i>Carregando...</div></div>
 <script>
-// ─── Firebase ───────────────────────────────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyDU1brp4LdFtf0QL9gq0RtpkSexU2rG7HE",
-  authDomain: "conduta-residencia.firebaseapp.com",
-  projectId: "conduta-residencia",
-  storageBucket: "conduta-residencia.firebasestorage.app",
-  messagingSenderId: "462838216816",
-  appId: "1:462838216816:web:b488f698031f713d81dcb5"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-db.enablePersistence().catch(e => console.log('Offline persistence:', e.code));
-
-// ─── Dados de exames ─────────────────────────────────────────────────────────
-const CATS_META = [
+const STORAGE_KEY='ef_pac_v1';
+const CATS_META=[
   {id:'hemograma',name:'Hemograma',icon:'🩸',bg:'#fef2f2'},
   {id:'inflamatorio',name:'Inflamatórios',icon:'🔥',bg:'#fef3c7'},
   {id:'cardiaco',name:'Cardíacos',icon:'❤️',bg:'#fef2f2'},
@@ -239,188 +202,185 @@ const CATS_META = [
   {id:'lipidico',name:'Lipídico',icon:'🧪',bg:'#fffbeb'},
   {id:'hemostasia',name:'Hemostasia',icon:'🩹',bg:'#fdf4ff'}
 ];
-
-const EX = [
-  {id:'hb',name:'Hemoglobina (Hb)',abbr:'Hb',cat:'hemograma',sub:'Série vermelha',unit:'g/dL',step:'0.1',sexDep:true,desc:'Proteína eritrocitária responsável pelo transporte de oxigênio.',altClin:'↑ policitemia, DPOC, desidratação | ↓ anemia ferropriva, def. B12/folato, hemólise, IRC',related:['Ht','ferritina','VCM','reticulócitos'],exRel:'Exercício agudo pode elevar por hemoconcentração.',condText:'< 8 g/dL → contraindicado | 8–10 g/dL → com restrição | ≥ 10 g/dL → indicado se estável | ↑ importante → investigar',ct:'m',refD:s=>s==='M'?'13,5–17,5 g/dL':'12,0–15,5 g/dL',ev:(v,s)=>{if(v<8)return{c:'x',st:'Criticamente baixo',cd:'Contraindicado — risco de hipóxia grave.',tip:'Aguardar avaliação médica.'};if(v<10)return{c:'a',st:'Anemia moderada',cd:'Com restrição — apenas baixa intensidade.',tip:'Monitorar SpO₂ e sintomas.'};const lo=s==='M'?13.5:12,hi=s==='M'?17.5:15.5;if(v<lo)return{c:'a',st:'Levemente abaixo do VR',cd:'Indicado com cautela se assintomático.',tip:'Avaliar Ht, ferritina e contexto.'};if(v<=hi)return{c:'ok',st:'Normal',cd:'Indicado.',tip:'Sem restrição por Hb.'};return{c:'a',st:'Elevado — investigar',cd:'Contraindicado até esclarecimento.',tip:'Avaliar policitemia, desidratação, DPOC.'}}},
-  {id:'ht',name:'Hematócrito (Ht)',abbr:'Ht',cat:'hemograma',sub:'Série vermelha',unit:'%',step:'0.1',sexDep:true,desc:'Percentual do volume sanguíneo ocupado por eritrócitos.',altClin:'↑ desidratação, policitemia | ↓ anemia, sangramento, hemodiluição',related:['Hb','hemácias'],exRel:'Pode elevar agudamente após exercício intenso.',condText:'Redução importante com sintomas limita progressão.',ct:'a',refD:s=>s==='M'?'40–52%':'36–48%',ev:(v,s)=>{if(v<28)return{c:'x',st:'Criticamente baixo',cd:'Contraindicado.',tip:'Avaliar Hb e causa.'};const lo=s==='M'?40:36,hi=s==='M'?52:48;if(v<lo)return{c:'a',st:'Abaixo do VR',cd:'Com restrição.',tip:'Interpretar com Hb e ferritina.'};if(v<=hi)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Elevado',cd:'Investigar policitemia/desidratação.',tip:''}}},
-  {id:'plt',name:'Plaquetas',abbr:'PLT',cat:'hemograma',sub:'Série vermelha',unit:'/mm³',step:'1000',sexDep:false,desc:'Fragmentos celulares essenciais à hemostasia primária.',altClin:'↑ trombocitose reacional/inflamatória | ↓ trombocitopenia com risco hemorrágico',related:['TP/INR','TTPa','fibrinogênio'],exRel:'Exercício extenuante pode alterar reatividade plaquetária.',condText:'Plaquetopenia importante contraindica atividades com risco de trauma/queda.',ct:'m',refD:_=>'150.000–450.000/mm³',ev:(v)=>{if(v<20000)return{c:'x',st:'Plaquetopenia grave',cd:'Contraindicado.',tip:''};if(v<50000)return{c:'x',st:'Plaquetopenia importante',cd:'Contraindicado — sem risco de trauma.',tip:''};if(v<150000)return{c:'a',st:'Plaquetopenia leve',cd:'Com restrição — evitar trauma/queda.',tip:''};if(v<=450000)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Trombocitose',cd:'Indicado com cautela — investigar.',tip:''}}},
-  {id:'leuc',name:'Leucócitos totais',abbr:'Leuc',cat:'hemograma',sub:'Série branca',unit:'/mm³',step:'100',sexDep:false,desc:'Contagem global de células do sistema imune.',altClin:'↑ LEUCOCITOSE: infecção, inflamação, estresse | ↓ LEUCOPENIA: imunossupressão, viroses',related:['Diferencial leucocitário','PCR','VHS'],exRel:'Leucocitose transitória é comum após exercício agudo.',condText:'A restrição real ocorre com neutropenia severa, febre ou infecção ativa — não isoladamente.',ct:'a',refD:_=>'4.000–11.000/mm³',ev:(v)=>{if(v<1000)return{c:'x',st:'Leucopenia grave',cd:'Contraindicado — alto risco infeccioso.',tip:''};if(v<4000)return{c:'a',st:'Leucopenia',cd:'Com restrição — avaliar clínica.',tip:'A conduta depende dos neutrófilos e contexto.'};if(v<=11000)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=30000)return{c:'a',st:'Leucocitose — avaliar',cd:'Com cautela — verificar febre e infecção.',tip:''};return{c:'a',st:'Leucocitose importante',cd:'Com restrição — investigar.',tip:''}}},
-  {id:'neut',name:'Neutrófilos (valor abs.)',abbr:'Neut',cat:'hemograma',sub:'Série branca',unit:'/mm³',step:'100',sexDep:false,desc:'Células da imunidade inata, predominantes em infecção bacteriana.',altClin:'↑ infecção bacteriana | ↓ NEUTROPENIA por toxicidade medular/infecção',related:['Leucócitos totais','PCR'],exRel:'Neutrofilia transitória pode ocorrer após exercício.',condText:'Neutropenia importante aumenta risco infeccioso.',ct:'m',refD:_=>'1.500–7.500/mm³',ev:(v)=>{if(v<500)return{c:'x',st:'Neutropenia grave',cd:'Contraindicado — risco infeccioso muito alto.',tip:'Isolamento de contato.'};if(v<1000)return{c:'a',st:'Neutropenia moderada',cd:'Com restrição — ambiente controlado.',tip:''};if(v<1500)return{c:'a',st:'Neutropenia leve',cd:'Com restrição — monitorar.',tip:''};if(v<=7500)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Neutrofilia',cd:'Avaliar — pode ser transitório pós-exercício.',tip:''}}},
-  {id:'pcr',name:'PCR',abbr:'PCR',cat:'inflamatorio',sub:'Biomarcadores inflamatórios',unit:'mg/L',step:'1',sexDep:false,desc:'Proteína C-reativa de fase aguda, sensível à inflamação sistêmica.',altClin:'Leve 10–40: viral, trauma | Moderada 40–200: bacteriana, autoimune | Grave >200: sepse, choque',related:['Leucograma','temperatura','ferritina'],exRel:'Exercício intenso pode elevar em 24–48 h.',condText:'PCR alta com quadro agudo pede cautela/adiamento.',ct:'m',refD:_=>'< 5 mg/L',ev:(v)=>{if(v<5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<40)return{c:'a',st:'Elevada leve',cd:'Com restrição — investigar causa.',tip:'Pode ser viral ou pós-exercício.'};if(v<200)return{c:'a',st:'Elevada moderada',cd:'Com restrição — adiar progressão.',tip:'Aguardar queda antes de progredir.'};if(v<500)return{c:'x',st:'Elevada grave',cd:'Contraindicado.',tip:'Estabilizar primeiro.'};return{c:'x',st:'Muito elevada — sepse?',cd:'Contraindicado.',tip:'PCR > 500 sugere sepse grave.'}}},
-  {id:'pct',name:'Procalcitonina',abbr:'PCT',cat:'inflamatorio',sub:'Biomarcadores inflamatórios',unit:'ng/mL',step:'0.01',sexDep:false,desc:'Marcador mais específico de infecção bacteriana sistêmica.',altClin:'↑ sepse e infecção bacteriana significativa',related:['PCR','leucograma'],exRel:'Sem relação típica com exercício.',condText:'Elevação relevante em internados geralmente contraindica exercício.',ct:'m',refD:_=>'< 0,1 ng/mL',ev:(v)=>{if(v<0.1)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<0.5)return{c:'a',st:'Zona cinza',cd:'Com restrição — avaliar.',tip:''};if(v<2)return{c:'a',st:'Elevada — infecção provável',cd:'Com restrição — adiar.',tip:''};return{c:'x',st:'Muito elevada — sepse',cd:'Contraindicado.',tip:''}}},
-  {id:'trop',name:'Troponina cardíaca',abbr:'Trop',cat:'cardiaco',sub:'Biomarcadores cardíacos',unit:'normal / elevada',step:'',sexDep:false,binary:true,desc:'Marcador de lesão miocárdica de alta sensibilidade.',altClin:'↑ infarto, miocardite, insuficiência renal, estresse miocárdico',related:['ECG','dor torácica'],exRel:'Exercício prolongado pode elevar discretamente.',condText:'Elevação + sintomas → CONTRAINDICA exercício.',ct:'x',refD:_=>'Indetectável / muito baixa',ev:(v)=>{if(v===0)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'x',st:'Elevada — lesão miocárdica',cd:'Contraindicado — investigar.',tip:'Avaliar ECG, sintomas e cinética.'}}},
-  {id:'bnp',name:'BNP',abbr:'BNP',cat:'cardiaco',sub:'Biomarcadores cardíacos',unit:'pg/mL',step:'1',sexDep:false,desc:'Peptídeo natriurético associado a sobrecarga ventricular.',altClin:'↑ insuficiência cardíaca, sobrecarga volêmica',related:['NT-proBNP','ecocardiograma'],exRel:'Exercício não é causa típica de elevação sustentada.',condText:'IC descompensada → CONTRAINDICA.',ct:'x',refD:_=>'< 100 pg/mL',ev:(v)=>{if(v<100)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<400)return{c:'a',st:'Elevado — avaliar',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito elevado — IC descompensada?',cd:'Contraindicado.',tip:''}}},
-  {id:'lac',name:'Lactato',abbr:'Lac',cat:'cardiaco',sub:'Integrado',unit:'mmol/L',step:'0.1',sexDep:false,desc:'Marcador de metabolismo anaeróbio e hipoperfusão sistêmica.',altClin:'↑ choque, hipoperfusão, sepse | exercício intenso eleva fisiologicamente',related:['Gasometria','sinais vitais'],exRel:'Até 15–20 mmol/L após esforço intenso é fisiológico; em repouso é sinal de gravidade.',condText:'Lactato > 4 mmol/L em repouso contraindica.',ct:'m',refD:_=>'< 2,0 mmol/L (repouso)',ev:(v)=>{if(v<2)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<4)return{c:'a',st:'Levemente elevado',cd:'Com restrição — monitorar.',tip:''};return{c:'x',st:'Hiperlactatemia',cd:'Contraindicado — investigar urgente.',tip:''}}},
-  {id:'ph',name:'pH (gasometria)',abbr:'pH',cat:'gasometria',sub:'Parâmetros',unit:'',step:'0.01',sexDep:false,desc:'Marcador global do equilíbrio ácido-base.',altClin:'↓ acidemia | ↑ alcalemia',related:['pCO₂','HCO₃⁻','lactato'],exRel:'Exercício intenso pode gerar acidose transitória.',condText:'pH < 7,2 ou > 7,6 contraindica.',ct:'m',refD:_=>'7,35–7,45',ev:(v)=>{if(v<7.2)return{c:'x',st:'Acidemia grave',cd:'Contraindicado.',tip:''};if(v<7.35)return{c:'a',st:'Acidemia',cd:'Com restrição.',tip:''};if(v<=7.45)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=7.6)return{c:'a',st:'Alcalemia',cd:'Com restrição.',tip:''};return{c:'x',st:'Alcalemia grave',cd:'Contraindicado.',tip:''}}},
-  {id:'sat',name:'Saturação O₂ (SpO₂)',abbr:'SpO₂',cat:'gasometria',sub:'Parâmetros',unit:'%',step:'0.5',sexDep:false,desc:'Percentual de hemoglobina saturada com oxigênio.',altClin:'↓ hipoxemia',related:['pO₂','Hb'],exRel:'Queda no esforço orienta limite funcional.',condText:'SatO₂ baixa em repouso contraindica progressão.',ct:'m',refD:_=>'≥ 95%',ev:(v)=>{if(v<88)return{c:'x',st:'Hipoxemia grave',cd:'Contraindicado.',tip:''};if(v<93)return{c:'a',st:'Hipoxemia moderada',cd:'Com restrição — O₂ suplementar.',tip:''};if(v<95)return{c:'a',st:'Hipoxemia leve',cd:'Com restrição — baixa intensidade.',tip:''};return{c:'ok',st:'Normal',cd:'Indicado.',tip:''}}},
-  {id:'k',name:'Potássio',abbr:'K⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mEq/L',step:'0.1',sexDep:false,desc:'Cátion essencial para excitabilidade neuromuscular e cardíaca.',altClin:'↑ DRC, acidose | ↓ vômitos, diuréticos, perdas GI',related:['ECG','função renal','magnésio'],exRel:'Pode oscilar agudamente com exercício intenso.',condText:'Hipo/hipercalemia significativas contraindicam.',ct:'m',refD:_=>'3,5–5,0 mEq/L',ev:(v)=>{if(v<3.0)return{c:'x',st:'Hipocalemia grave',cd:'Contraindicado — risco de arritmia.',tip:'ECG urgente.'};if(v<3.5)return{c:'a',st:'Hipocalemia leve',cd:'Com restrição — baixa intensidade.',tip:''};if(v<=5.0)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=5.5)return{c:'a',st:'Hipercalemia leve',cd:'Com restrição — monitorar ECG.',tip:''};return{c:'x',st:'Hipercalemia grave',cd:'Contraindicado.',tip:''}}},
-  {id:'na',name:'Sódio',abbr:'Na⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mEq/L',step:'1',sexDep:false,desc:'Principal cátion extracelular; regula osmolaridade e volume.',altClin:'↑ hipernatremia | ↓ hiponatremia: SIADH, diuréticos',related:['Osmolalidade','volemia'],exRel:'Perdas no suor podem alterar.',condText:'Na < 130 ou > 150 mEq/L → cautela/adiamento.',ct:'m',refD:_=>'135–145 mEq/L',ev:(v)=>{if(v<130)return{c:'x',st:'Hiponatremia grave',cd:'Contraindicado.',tip:''};if(v<135)return{c:'a',st:'Hiponatremia leve',cd:'Com restrição.',tip:''};if(v<=145)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=150)return{c:'a',st:'Hipernatremia leve',cd:'Com restrição.',tip:''};return{c:'x',st:'Hipernatremia grave',cd:'Contraindicado.',tip:''}}},
-  {id:'mg',name:'Magnésio',abbr:'Mg²⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mg/dL',step:'0.1',sexDep:false,desc:'Participa da excitabilidade neuromuscular e reações enzimáticas.',altClin:'↑ insuficiência renal | ↓ perdas GI/renais, desnutrição',related:['Potássio','cálcio'],exRel:'Pode reduzir em perdas importantes; associado a cãibras.',condText:'Hipomagnesemia importante requer correção.',ct:'a',refD:_=>'1,7–2,2 mg/dL',ev:(v)=>{if(v<1.2)return{c:'x',st:'Hipomagnesemia grave',cd:'Contraindicado.',tip:''};if(v<1.7)return{c:'a',st:'Hipomagnesemia',cd:'Com restrição — corrigir.',tip:''};if(v<=2.2)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Hipermagnesemia',cd:'Com restrição — avaliar função renal.',tip:''}}},
-  {id:'fosforo',name:'Fósforo',abbr:'P',cat:'eletrolitos',sub:'Eletrólitos',unit:'mg/dL',step:'0.1',sexDep:false,desc:'Importante para ATP, membranas celulares e metabolismo ósseo.',altClin:'↑ insuficiência renal | ↓ realimentação, hiperparatireoidismo',related:['Cálcio','PTH'],exRel:'Pode cair em situações catabólicas.',condText:'Hipofosfatemia importante reduz tolerância ao esforço.',ct:'a',refD:_=>'2,5–4,5 mg/dL',ev:(v)=>{if(v<1.5)return{c:'x',st:'Hipofosfatemia grave',cd:'Contraindicado.',tip:''};if(v<2.5)return{c:'a',st:'Hipofosfatemia',cd:'Com restrição.',tip:''};if(v<=4.5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Hiperfosfatemia',cd:'Com restrição — avaliar função renal.',tip:''}}},
-  {id:'cal',name:'Cálcio total',abbr:'Ca²⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mg/dL',step:'0.1',sexDep:false,desc:'Mineral essencial para contração muscular e coagulação.',altClin:'↑ hiperparatireoidismo, neoplasia | ↓ def. vitamina D',related:['Albumina','cálcio ionizado','PTH'],exRel:'Perdas no suor são pequenas.',condText:'Alterações importantes exigem cautela pelo risco neuromuscular/cardíaco.',ct:'a',refD:_=>'8,5–10,5 mg/dL',ev:(v)=>{if(v<7.5)return{c:'x',st:'Hipocalcemia grave',cd:'Contraindicado.',tip:''};if(v<8.5)return{c:'a',st:'Hipocalcemia',cd:'Com restrição.',tip:''};if(v<=10.5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=12)return{c:'a',st:'Hipercalcemia leve',cd:'Com restrição.',tip:''};return{c:'x',st:'Hipercalcemia grave',cd:'Contraindicado.',tip:''}}},
-  {id:'crea',name:'Creatinina',abbr:'Crea',cat:'renal',sub:'Função renal',unit:'mg/dL',step:'0.01',sexDep:true,desc:'Produto do metabolismo da creatina; estimativa da função renal.',altClin:'↑ disfunção renal, desidratação | ↓ baixa massa muscular',related:['TFG estimada','ureia'],exRel:'Pode ser maior em atletas após exercício intenso.',condText:'Creatinina elevada com instabilidade renal exige cautela.',ct:'a',refD:s=>s==='M'?'0,7–1,3 mg/dL':'0,6–1,1 mg/dL',ev:(v,s)=>{const hi=s==='M'?1.3:1.1;if(v<=hi)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<2*hi)return{c:'a',st:'Levemente elevada',cd:'Com restrição.',tip:''};if(v<3*hi)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição — individualizar.',tip:''};return{c:'x',st:'Muito elevada',cd:'Contraindicado sem avaliação médica.',tip:''}}},
-  {id:'tfg',name:'TFG estimada (eGFR)',abbr:'eGFR',cat:'renal',sub:'Função renal',unit:'mL/min/1,73m²',step:'1',sexDep:false,desc:'Estimativa da filtração glomerular.',altClin:'↓ doença renal crônica ou aguda',related:['Creatinina','albuminúria'],exRel:'Sem efeito agudo direto.',condText:'TFG reduzida importante requer individualização.',ct:'a',refD:_=>'> 90 mL/min/1,73m²',ev:(v)=>{if(v>=60)return{c:'ok',st:'Normal / levemente reduzida',cd:'Indicado.',tip:''};if(v>=30)return{c:'a',st:'Reduzida — DRC G3',cd:'Com restrição.',tip:''};if(v>=15)return{c:'a',st:'Muito reduzida — DRC G4',cd:'Com restrição — supervisão rigorosa.',tip:''};return{c:'x',st:'DRC G5 / falência renal',cd:'Contraindicado sem avaliação especializada.',tip:''}}},
-  {id:'ck',name:'Creatina quinase (CK)',abbr:'CK',cat:'muscular',sub:'Biomarcadores musculares',unit:'U/L',step:'10',sexDep:false,desc:'Enzima muscular para monitorar dano muscular.',altClin:'↑ lesão muscular, trauma, miopatia, rabdomiólise',related:['AST','LDH','mioglobina'],exRel:'Pode subir 10–100x após exercício; pico em 24–48 h.',condText:'CK muito elevada, dor intensa e urina escura contraindicam.',ct:'m',refD:_=>'30–200 U/L',ev:(v)=>{if(v<200)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<1000)return{c:'a',st:'Levemente elevada',cd:'Com restrição — avaliar contexto.',tip:'Considerar exercício recente.'};if(v<5000)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição — suspender progressão.',tip:'Avaliar mioglobina e diurese.'};return{c:'x',st:'Muito elevada — rabdomiólise?',cd:'Contraindicado.',tip:'CK > 5.000 + dor + urina escura = rabdomiólise.'}}},
-  {id:'ast',name:'TGO / AST',abbr:'AST',cat:'hepatico',sub:'Lesão hepatocelular',unit:'U/L',step:'1',sexDep:false,desc:'Enzima presente em fígado, músculo e outros tecidos.',altClin:'↑ lesão hepatocelular, lesão muscular, hemólise',related:['TGP','CK','LDH'],exRel:'Pode elevar após exercício por origem muscular.',condText:'Interpretar com CK antes de restringir atividade.',ct:'a',refD:_=>'< 40 U/L',ev:(v)=>{if(v<40)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<120)return{c:'a',st:'Levemente elevada',cd:'Com restrição — interpretar com CK.',tip:'AST alta pós-exercício pode ser muscular.'};if(v<400)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito elevada',cd:'Contraindicado até investigação.',tip:''}}},
-  {id:'alt',name:'TGP / ALT',abbr:'ALT',cat:'hepatico',sub:'Lesão hepatocelular',unit:'U/L',step:'1',sexDep:false,desc:'Enzima mais específica de hepatócitos.',altClin:'↑ lesão hepatocelular, esteatose, hepatites',related:['TGO','GGT','FA'],exRel:'Menos influenciada pelo exercício que AST.',condText:'Elevação importante com sinais clínicos pede cautela.',ct:'a',refD:_=>'< 41 U/L',ev:(v)=>{if(v<41)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<120)return{c:'a',st:'Levemente elevada',cd:'Com restrição.',tip:''};if(v<400)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito elevada',cd:'Contraindicado até investigação.',tip:''}}},
-  {id:'alb',name:'Albumina',abbr:'Alb',cat:'hepatico',sub:'Função hepática',unit:'g/dL',step:'0.1',sexDep:false,desc:'Proteína plasmática sintetizada pelo fígado; reflete nutrição e síntese.',altClin:'↓ hepatopatia crônica, desnutrição, inflamação',related:['Proteínas totais','INR'],exRel:'Não muda agudamente pelo exercício.',condText:'Albumina baixa sugere fragilidade clínica — cautela na progressão.',ct:'a',refD:_=>'3,5–5,0 g/dL',ev:(v)=>{if(v>=3.5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v>=3.0)return{c:'a',st:'Levemente reduzida',cd:'Com restrição — monitorar fragilidade.',tip:''};if(v>=2.5)return{c:'a',st:'Moderadamente reduzida',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito reduzida',cd:'Contraindicado sem avaliação.',tip:''}}},
-  {id:'inr',name:'INR / TP',abbr:'INR',cat:'hemostasia',sub:'Coagulação',unit:'',step:'0.1',sexDep:false,desc:'Via extrínseca da coagulação e síntese hepática.',altClin:'↑ anticoagulação, hepatopatia, def. vitamina K',related:['Albumina','plaquetas'],exRel:'Sem efeito típico do exercício.',condText:'INR elevado aumenta risco hemorrágico e limita exercício.',ct:'a',refD:_=>'0,8–1,2',ev:(v)=>{if(v<=1.2)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=2.0)return{c:'a',st:'Levemente aumentado',cd:'Com restrição — evitar trauma.',tip:''};if(v<=3.5)return{c:'a',st:'Aumentado',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito aumentado',cd:'Contraindicado — alto risco hemorrágico.',tip:''}}},
-  {id:'glic',name:'Glicemia',abbr:'Glic',cat:'glicidico',sub:'Glicídico',unit:'mg/dL',step:'1',sexDep:false,desc:'Principal marcador da homeostase glicêmica.',altClin:'↑ diabetes, estresse, corticoide | ↓ hipoglicemia',related:['HbA1c','insulina','cetonas'],exRel:'Exercício geralmente reduz a glicemia.',condText:'< 70 ou hiperglicemia importante exigem adiamento.',ct:'m',refD:_=>'Jejum: 70–99 mg/dL',ev:(v)=>{if(v<70)return{c:'x',st:'Hipoglicemia',cd:'Contraindicado — corrigir antes.',tip:'Risco de perda de consciência.'};if(v<130)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<250)return{c:'a',st:'Hiperglicemia moderada',cd:'Com restrição.',tip:''};if(v<300)return{c:'a',st:'Hiperglicemia importante',cd:'Com restrição — adiar.',tip:''};return{c:'x',st:'Hiperglicemia grave',cd:'Contraindicado.',tip:''}}},
-  {id:'ferr',name:'Ferritina',abbr:'Ferr',cat:'ferro',sub:'Metabolismo do ferro',unit:'ng/mL',step:'1',sexDep:true,desc:'Proteína de armazenamento de ferro; reagente de fase aguda.',altClin:'↑ inflamação, neoplasias | ↓ deficiência de ferro, queda de VO₂máx',related:['Ferro sérico','saturação de transferrina','PCR','Hb'],exRel:'Atletas endurance podem ter ferritina reduzida; inflamação pode mascarar deficiência.',condText:'Baixa com sintomas → cautela e correção antes de progressão.',ct:'a',refD:s=>s==='M'?'30–400 ng/mL':'15–150 (pré) | 30–400 (pós)',ev:(v,s)=>{const lo=s==='M'?30:15;if(v<lo)return{c:'a',st:'Ferritina baixa',cd:'Com restrição se sintomático.',tip:''};if(v<500)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Elevada — investigar',cd:'Não contraindica isoladamente.',tip:'Pode ser reagente de fase aguda.'}}},
-  {id:'vitd',name:'Vitamina D (25-OH)',abbr:'Vit D',cat:'vitaminas',sub:'Vitaminas',unit:'ng/mL',step:'0.5',sexDep:false,desc:'Marcador do estoque corporal de vitamina D.',altClin:'↑ suplementação excessiva | ↓ deficiência, baixa exposição solar',related:['Cálcio','fósforo','PTH'],exRel:'Níveis adequados favorecem função muscular.',condText:'Déficit importante pede correção; não contraindica isoladamente.',ct:'ok',refD:_=>'20–60 ng/mL',ev:(v)=>{if(v<10)return{c:'a',st:'Deficiência grave',cd:'Com restrição — função muscular comprometida.',tip:''};if(v<20)return{c:'a',st:'Deficiência',cd:'Indicado com cautela — repor.',tip:''};if(v<=60)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Possivelmente elevada',cd:'Investigar suplementação excessiva.',tip:''}}}
+const EX=[
+  {id:'hb',name:'Hemoglobina (Hb)',abbr:'Hb',cat:'hemograma',sub:'Série vermelha',unit:'g/dL',step:'0.1',sexDep:true,desc:'Proteína eritrocitária responsável pelo transporte de oxigênio.',altClin:'↑ policitemia, DPOC, desidratação | ↓ anemia ferropriva, def. B12/folato, hemólise, IRC',related:['Ht','ferritina','VCM','reticulócitos'],exRel:'Exercício agudo pode elevar por hemoconcentração.',condText:'< 8 g/dL → contraindicado | 8–10 g/dL → com restrição | ≥ 10 g/dL → indicado se estável | ↑ importante → investigar',ct:'m',refDisplay:s=>s==='M'?'13,5–17,5 g/dL':'12,0–15,5 g/dL',ev:(v,s)=>{if(v<8)return{c:'x',st:'Criticamente baixo',cd:'Contraindicado — risco de hipóxia grave.',tip:'Aguardar avaliação médica.'};if(v<10)return{c:'a',st:'Anemia moderada',cd:'Com restrição — apenas baixa intensidade.',tip:'Monitorar SpO₂ e sintomas.'};const lo=s==='M'?13.5:12,hi=s==='M'?17.5:15.5;if(v<lo)return{c:'a',st:'Levemente abaixo do VR',cd:'Indicado com cautela se assintomático.',tip:'Avaliar Ht, ferritina e contexto.'};if(v<=hi)return{c:'ok',st:'Normal',cd:'Indicado.',tip:'Sem restrição por Hb.'};return{c:'a',st:'Elevado — investigar',cd:'Contraindicado até esclarecimento.',tip:'Avaliar policitemia, desidratação, DPOC.'}}},
+  {id:'ht',name:'Hematócrito (Ht)',abbr:'Ht',cat:'hemograma',sub:'Série vermelha',unit:'%',step:'0.1',sexDep:true,desc:'Percentual do volume sanguíneo ocupado por eritrócitos.',altClin:'↑ desidratação, policitemia | ↓ anemia, sangramento, hemodiluição',related:['Hb','hemácias'],exRel:'Pode elevar agudamente após exercício intenso.',condText:'Redução importante com sintomas limita progressão.',ct:'a',refDisplay:s=>s==='M'?'40–52%':'36–48%',ev:(v,s)=>{if(v<28)return{c:'x',st:'Criticamente baixo',cd:'Contraindicado.',tip:'Avaliar Hb e causa.'};const lo=s==='M'?40:36,hi=s==='M'?52:48;if(v<lo)return{c:'a',st:'Abaixo do VR',cd:'Com restrição.',tip:'Interpretar com Hb e ferritina.'};if(v<=hi)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Elevado',cd:'Investigar policitemia/desidratação.',tip:''}}},
+  {id:'plt',name:'Plaquetas',abbr:'PLT',cat:'hemograma',sub:'Série vermelha',unit:'/mm³',step:'1000',sexDep:false,desc:'Fragmentos celulares essenciais à hemostasia primária.',altClin:'↑ trombocitose reacional/inflamatória | ↓ trombocitopenia com risco hemorrágico',related:['TP/INR','TTPa','fibrinogênio'],exRel:'Exercício extenuante pode alterar reatividade plaquetária.',condText:'Plaquetopenia importante contraindica atividades com risco de trauma/queda.',ct:'m',refDisplay:_=>'150.000–450.000/mm³',ev:(v)=>{if(v<20000)return{c:'x',st:'Plaquetopenia grave',cd:'Contraindicado.',tip:'Qualquer atividade contraindicada.'};if(v<50000)return{c:'x',st:'Plaquetopenia importante',cd:'Contraindicado — sem risco de trauma.',tip:'Exercício passivo no leito apenas.'};if(v<150000)return{c:'a',st:'Plaquetopenia leve',cd:'Com restrição — evitar trauma/queda.',tip:''};if(v<=450000)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Trombocitose',cd:'Indicado com cautela — investigar.',tip:''}}},
+  {id:'leuc',name:'Leucócitos totais',abbr:'Leuc',cat:'hemograma',sub:'Série branca',unit:'/mm³',step:'100',sexDep:false,desc:'Contagem global de células do sistema imune.',altClin:'↑ LEUCOCITOSE: infecção, inflamação, estresse | ↓ LEUCOPENIA: imunossupressão, viroses',related:['Diferencial leucocitário','PCR','VHS'],exRel:'Leucocitose transitória é comum após exercício agudo.',condText:'A restrição real ocorre com neutropenia severa, febre ou infecção ativa — não isoladamente.',ct:'a',refDisplay:_=>'4.000–11.000/mm³',ev:(v)=>{if(v<1000)return{c:'x',st:'Leucopenia grave',cd:'Contraindicado — alto risco infeccioso.',tip:''};if(v<4000)return{c:'a',st:'Leucopenia',cd:'Com restrição — avaliar clínica.',tip:'A conduta depende dos neutrófilos e contexto.'};if(v<=11000)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=30000)return{c:'a',st:'Leucocitose — avaliar',cd:'Com cautela — verificar febre e infecção.',tip:''};return{c:'a',st:'Leucocitose importante',cd:'Com restrição — investigar.',tip:''}}},
+  {id:'neut',name:'Neutrófilos (valor abs.)',abbr:'Neut',cat:'hemograma',sub:'Série branca',unit:'/mm³',step:'100',sexDep:false,desc:'Células da imunidade inata, predominantes em infecção bacteriana.',altClin:'↑ infecção bacteriana | ↓ NEUTROPENIA por toxicidade medular/infecção',related:['Leucócitos totais','PCR'],exRel:'Neutrofilia transitória pode ocorrer após exercício.',condText:'Neutropenia importante aumenta risco infeccioso.',ct:'m',refDisplay:_=>'1.500–7.500/mm³',ev:(v)=>{if(v<500)return{c:'x',st:'Neutropenia grave',cd:'Contraindicado — risco infeccioso muito alto.',tip:'Isolamento de contato.'};if(v<1000)return{c:'a',st:'Neutropenia moderada',cd:'Com restrição — ambiente controlado.',tip:''};if(v<1500)return{c:'a',st:'Neutropenia leve',cd:'Com restrição — monitorar.',tip:''};if(v<=7500)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Neutrofilia',cd:'Avaliar — pode ser transitório pós-exercício.',tip:''}}},
+  {id:'pcr',name:'PCR',abbr:'PCR',cat:'inflamatorio',sub:'Biomarcadores inflamatórios',unit:'mg/L',step:'1',sexDep:false,desc:'Proteína C-reativa de fase aguda, sensível à inflamação sistêmica.',altClin:'Leve 10–40: viral, trauma | Moderada 40–200: bacteriana, autoimune | Grave >200: sepse, choque',related:['Leucograma','temperatura','ferritina'],exRel:'Exercício intenso pode elevar em 24–48 h.',condText:'PCR alta com quadro agudo pede cautela/adiamento.',ct:'m',refDisplay:_=>'< 5 mg/L',ev:(v)=>{if(v<5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<40)return{c:'a',st:'Elevada leve',cd:'Com restrição — investigar causa.',tip:'Pode ser viral ou pós-exercício.'};if(v<200)return{c:'a',st:'Elevada moderada',cd:'Com restrição — adiar progressão.',tip:'Aguardar queda antes de progredir.'};if(v<500)return{c:'x',st:'Elevada grave',cd:'Contraindicado.',tip:'Estabilizar primeiro.'};return{c:'x',st:'Muito elevada — sepse?',cd:'Contraindicado.',tip:'PCR > 500 sugere sepse grave.'}}},
+  {id:'pct',name:'Procalcitonina',abbr:'PCT',cat:'inflamatorio',sub:'Biomarcadores inflamatórios',unit:'ng/mL',step:'0.01',sexDep:false,desc:'Marcador mais específico de infecção bacteriana sistêmica.',altClin:'↑ sepse e infecção bacteriana significativa',related:['PCR','leucograma'],exRel:'Sem relação típica com exercício.',condText:'Elevação relevante em internados geralmente contraindica exercício.',ct:'m',refDisplay:_=>'< 0,1 ng/mL',ev:(v)=>{if(v<0.1)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<0.5)return{c:'a',st:'Zona cinza',cd:'Com restrição — avaliar.',tip:''};if(v<2)return{c:'a',st:'Elevada — infecção provável',cd:'Com restrição — adiar.',tip:''};return{c:'x',st:'Muito elevada — sepse',cd:'Contraindicado.',tip:''}}},
+  {id:'trop',name:'Troponina cardíaca',abbr:'Trop',cat:'cardiaco',sub:'Biomarcadores cardíacos',unit:'normal / elevada',step:'',sexDep:false,binary:true,desc:'Marcador de lesão miocárdica de alta sensibilidade.',altClin:'↑ infarto, miocardite, insuficiência renal, estresse miocárdico',related:['ECG','dor torácica'],exRel:'Exercício prolongado pode elevar discretamente.',condText:'Elevação + sintomas → CONTRAINDICA exercício.',ct:'x',refDisplay:_=>'Indetectável / muito baixa',ev:(v)=>{if(v===0)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'x',st:'Elevada — lesão miocárdica',cd:'Contraindicado — investigar.',tip:'Avaliar ECG, sintomas e cinética.'}}},
+  {id:'bnp',name:'BNP',abbr:'BNP',cat:'cardiaco',sub:'Biomarcadores cardíacos',unit:'pg/mL',step:'1',sexDep:false,desc:'Peptídeo natriurético associado a sobrecarga ventricular.',altClin:'↑ insuficiência cardíaca, sobrecarga volêmica',related:['NT-proBNP','ecocardiograma'],exRel:'Exercício não é causa típica de elevação sustentada.',condText:'IC descompensada → CONTRAINDICA.',ct:'x',refDisplay:_=>'< 100 pg/mL',ev:(v)=>{if(v<100)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<400)return{c:'a',st:'Elevado — avaliar',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito elevado — IC descompensada?',cd:'Contraindicado.',tip:''}}},
+  {id:'lac',name:'Lactato',abbr:'Lac',cat:'cardiaco',sub:'Integrado',unit:'mmol/L',step:'0.1',sexDep:false,desc:'Marcador de metabolismo anaeróbio e hipoperfusão sistêmica.',altClin:'↑ choque, hipoperfusão, sepse | exercício intenso eleva fisiologicamente',related:['Gasometria','sinais vitais'],exRel:'Até 15–20 mmol/L após esforço intenso é fisiológico; em repouso é sinal de gravidade.',condText:'Lactato > 4 mmol/L em repouso contraindica.',ct:'m',refDisplay:_=>'< 2,0 mmol/L (repouso)',ev:(v)=>{if(v<2)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<4)return{c:'a',st:'Levemente elevado',cd:'Com restrição — monitorar.',tip:''};return{c:'x',st:'Hiperlactatemia',cd:'Contraindicado — investigar urgente.',tip:''}}},
+  {id:'ph',name:'pH (gasometria)',abbr:'pH',cat:'gasometria',sub:'Parâmetros',unit:'',step:'0.01',sexDep:false,desc:'Marcador global do equilíbrio ácido-base.',altClin:'↓ acidemia | ↑ alcalemia',related:['pCO₂','HCO₃⁻','lactato'],exRel:'Exercício intenso pode gerar acidose transitória.',condText:'pH < 7,2 ou > 7,6 contraindica.',ct:'m',refDisplay:_=>'7,35–7,45',ev:(v)=>{if(v<7.2)return{c:'x',st:'Acidemia grave',cd:'Contraindicado.',tip:''};if(v<7.35)return{c:'a',st:'Acidemia',cd:'Com restrição.',tip:''};if(v<=7.45)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=7.6)return{c:'a',st:'Alcalemia',cd:'Com restrição.',tip:''};return{c:'x',st:'Alcalemia grave',cd:'Contraindicado.',tip:''}}},
+  {id:'sat',name:'Saturação O₂ (SpO₂)',abbr:'SpO₂',cat:'gasometria',sub:'Parâmetros',unit:'%',step:'0.5',sexDep:false,desc:'Percentual de hemoglobina saturada com oxigênio.',altClin:'↓ hipoxemia',related:['pO₂','Hb'],exRel:'Queda no esforço orienta limite funcional.',condText:'SatO₂ baixa em repouso contraindica progressão.',ct:'m',refDisplay:_=>'≥ 95%',ev:(v)=>{if(v<88)return{c:'x',st:'Hipoxemia grave',cd:'Contraindicado.',tip:''};if(v<93)return{c:'a',st:'Hipoxemia moderada',cd:'Com restrição — O₂ suplementar.',tip:''};if(v<95)return{c:'a',st:'Hipoxemia leve',cd:'Com restrição — baixa intensidade.',tip:''};return{c:'ok',st:'Normal',cd:'Indicado.',tip:''}}},
+  {id:'k',name:'Potássio',abbr:'K⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mEq/L',step:'0.1',sexDep:false,desc:'Cátion essencial para excitabilidade neuromuscular e cardíaca.',altClin:'↑ DRC, acidose | ↓ vômitos, diuréticos, perdas GI',related:['ECG','função renal','magnésio'],exRel:'Pode oscilar agudamente com exercício intenso.',condText:'Hipo/hipercalemia significativas contraindicam.',ct:'m',refDisplay:_=>'3,5–5,0 mEq/L',ev:(v)=>{if(v<3.0)return{c:'x',st:'Hipocalemia grave',cd:'Contraindicado — risco de arritmia.',tip:'ECG urgente.'};if(v<3.5)return{c:'a',st:'Hipocalemia leve',cd:'Com restrição — baixa intensidade.',tip:''};if(v<=5.0)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=5.5)return{c:'a',st:'Hipercalemia leve',cd:'Com restrição — monitorar ECG.',tip:''};return{c:'x',st:'Hipercalemia grave',cd:'Contraindicado.',tip:''}}},
+  {id:'na',name:'Sódio',abbr:'Na⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mEq/L',step:'1',sexDep:false,desc:'Principal cátion extracelular; regula osmolaridade e volume.',altClin:'↑ hipernatremia | ↓ hiponatremia: SIADH, diuréticos',related:['Osmolalidade','volemia'],exRel:'Perdas no suor podem alterar.',condText:'Na < 130 ou > 150 mEq/L → cautela/adiamento.',ct:'m',refDisplay:_=>'135–145 mEq/L',ev:(v)=>{if(v<130)return{c:'x',st:'Hiponatremia grave',cd:'Contraindicado.',tip:''};if(v<135)return{c:'a',st:'Hiponatremia leve',cd:'Com restrição.',tip:''};if(v<=145)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=150)return{c:'a',st:'Hipernatremia leve',cd:'Com restrição.',tip:''};return{c:'x',st:'Hipernatremia grave',cd:'Contraindicado.',tip:''}}},
+  {id:'mg',name:'Magnésio',abbr:'Mg²⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mg/dL',step:'0.1',sexDep:false,desc:'Participa da excitabilidade neuromuscular e reações enzimáticas.',altClin:'↑ insuficiência renal | ↓ perdas GI/renais, desnutrição',related:['Potássio','cálcio'],exRel:'Pode reduzir em perdas importantes; associado a cãibras.',condText:'Hipomagnesemia importante requer correção.',ct:'a',refDisplay:_=>'1,7–2,2 mg/dL',ev:(v)=>{if(v<1.2)return{c:'x',st:'Hipomagnesemia grave',cd:'Contraindicado.',tip:''};if(v<1.7)return{c:'a',st:'Hipomagnesemia',cd:'Com restrição — corrigir.',tip:''};if(v<=2.2)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Hipermagnesemia',cd:'Com restrição — avaliar função renal.',tip:''}}},
+  {id:'fosforo',name:'Fósforo',abbr:'P',cat:'eletrolitos',sub:'Eletrólitos',unit:'mg/dL',step:'0.1',sexDep:false,desc:'Importante para ATP, membranas celulares e metabolismo ósseo.',altClin:'↑ insuficiência renal | ↓ realimentação, hiperparatireoidismo',related:['Cálcio','PTH'],exRel:'Pode cair em situações catabólicas.',condText:'Hipofosfatemia importante reduz tolerância ao esforço.',ct:'a',refDisplay:_=>'2,5–4,5 mg/dL',ev:(v)=>{if(v<1.5)return{c:'x',st:'Hipofosfatemia grave',cd:'Contraindicado.',tip:''};if(v<2.5)return{c:'a',st:'Hipofosfatemia',cd:'Com restrição.',tip:''};if(v<=4.5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Hiperfosfatemia',cd:'Com restrição — avaliar função renal.',tip:''}}},
+  {id:'cal',name:'Cálcio total',abbr:'Ca²⁺',cat:'eletrolitos',sub:'Eletrólitos',unit:'mg/dL',step:'0.1',sexDep:false,desc:'Mineral essencial para contração muscular e coagulação.',altClin:'↑ hiperparatireoidismo, neoplasia | ↓ def. vitamina D',related:['Albumina','cálcio ionizado','PTH'],exRel:'Perdas no suor são pequenas.',condText:'Alterações importantes exigem cautela pelo risco neuromuscular/cardíaco.',ct:'a',refDisplay:_=>'8,5–10,5 mg/dL',ev:(v)=>{if(v<7.5)return{c:'x',st:'Hipocalcemia grave',cd:'Contraindicado.',tip:''};if(v<8.5)return{c:'a',st:'Hipocalcemia',cd:'Com restrição.',tip:''};if(v<=10.5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=12)return{c:'a',st:'Hipercalcemia leve',cd:'Com restrição.',tip:''};return{c:'x',st:'Hipercalcemia grave',cd:'Contraindicado.',tip:''}}},
+  {id:'crea',name:'Creatinina',abbr:'Crea',cat:'renal',sub:'Função renal',unit:'mg/dL',step:'0.01',sexDep:true,desc:'Produto do metabolismo da creatina; estimativa da função renal.',altClin:'↑ disfunção renal, desidratação | ↓ baixa massa muscular',related:['TFG estimada','ureia'],exRel:'Pode ser maior em atletas após exercício intenso.',condText:'Creatinina elevada com instabilidade renal exige cautela.',ct:'a',refDisplay:s=>s==='M'?'0,7–1,3 mg/dL':'0,6–1,1 mg/dL',ev:(v,s)=>{const hi=s==='M'?1.3:1.1;if(v<=hi)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<2*hi)return{c:'a',st:'Levemente elevada',cd:'Com restrição.',tip:''};if(v<3*hi)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição — individualizar.',tip:''};return{c:'x',st:'Muito elevada',cd:'Contraindicado sem avaliação médica.',tip:''}}},
+  {id:'tfg',name:'TFG estimada (eGFR)',abbr:'eGFR',cat:'renal',sub:'Função renal',unit:'mL/min/1,73m²',step:'1',sexDep:false,desc:'Estimativa da filtração glomerular.',altClin:'↓ doença renal crônica ou aguda',related:['Creatinina','albuminúria'],exRel:'Sem efeito agudo direto.',condText:'TFG reduzida importante requer individualização.',ct:'a',refDisplay:_=>'> 90 mL/min/1,73m²',ev:(v)=>{if(v>=60)return{c:'ok',st:'Normal / levemente reduzida',cd:'Indicado.',tip:''};if(v>=30)return{c:'a',st:'Reduzida — DRC G3',cd:'Com restrição.',tip:''};if(v>=15)return{c:'a',st:'Muito reduzida — DRC G4',cd:'Com restrição — supervisão rigorosa.',tip:''};return{c:'x',st:'DRC G5 / falência renal',cd:'Contraindicado sem avaliação especializada.',tip:''}}},
+  {id:'ck',name:'Creatina quinase (CK)',abbr:'CK',cat:'muscular',sub:'Biomarcadores musculares',unit:'U/L',step:'10',sexDep:false,desc:'Enzima muscular para monitorar dano muscular.',altClin:'↑ lesão muscular, trauma, miopatia, rabdomiólise',related:['AST','LDH','mioglobina'],exRel:'Pode subir 10–100x após exercício; pico em 24–48 h.',condText:'CK muito elevada, dor intensa e urina escura contraindicam.',ct:'m',refDisplay:_=>'30–200 U/L',ev:(v)=>{if(v<200)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<1000)return{c:'a',st:'Levemente elevada',cd:'Com restrição — avaliar contexto.',tip:'Considerar exercício recente.'};if(v<5000)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição — suspender progressão.',tip:'Avaliar mioglobina e diurese.'};return{c:'x',st:'Muito elevada — rabdomiólise?',cd:'Contraindicado.',tip:'CK > 5.000 + dor + urina escura = rabdomiólise.'}}},
+  {id:'ast',name:'TGO / AST',abbr:'AST',cat:'hepatico',sub:'Lesão hepatocelular',unit:'U/L',step:'1',sexDep:false,desc:'Enzima presente em fígado, músculo e outros tecidos.',altClin:'↑ lesão hepatocelular, lesão muscular, hemólise',related:['TGP','CK','LDH'],exRel:'Pode elevar após exercício por origem muscular.',condText:'Interpretar com CK antes de restringir atividade.',ct:'a',refDisplay:_=>'< 40 U/L',ev:(v)=>{if(v<40)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<120)return{c:'a',st:'Levemente elevada',cd:'Com restrição — interpretar com CK.',tip:'AST alta pós-exercício pode ser muscular.'};if(v<400)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito elevada',cd:'Contraindicado até investigação.',tip:''}}},
+  {id:'alt',name:'TGP / ALT',abbr:'ALT',cat:'hepatico',sub:'Lesão hepatocelular',unit:'U/L',step:'1',sexDep:false,desc:'Enzima mais específica de hepatócitos.',altClin:'↑ lesão hepatocelular, esteatose, hepatites',related:['TGO','GGT','FA'],exRel:'Menos influenciada pelo exercício que AST.',condText:'Elevação importante com sinais clínicos pede cautela.',ct:'a',refDisplay:_=>'< 41 U/L',ev:(v)=>{if(v<41)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<120)return{c:'a',st:'Levemente elevada',cd:'Com restrição.',tip:''};if(v<400)return{c:'a',st:'Moderadamente elevada',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito elevada',cd:'Contraindicado até investigação.',tip:''}}},
+  {id:'alb',name:'Albumina',abbr:'Alb',cat:'hepatico',sub:'Função hepática',unit:'g/dL',step:'0.1',sexDep:false,desc:'Proteína plasmática sintetizada pelo fígado; reflete nutrição e síntese.',altClin:'↓ hepatopatia crônica, desnutrição, inflamação',related:['Proteínas totais','INR'],exRel:'Não muda agudamente pelo exercício.',condText:'Albumina baixa sugere fragilidade clínica — cautela na progressão.',ct:'a',refDisplay:_=>'3,5–5,0 g/dL',ev:(v)=>{if(v>=3.5)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v>=3.0)return{c:'a',st:'Levemente reduzida',cd:'Com restrição — monitorar fragilidade.',tip:''};if(v>=2.5)return{c:'a',st:'Moderadamente reduzida',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito reduzida',cd:'Contraindicado sem avaliação.',tip:''}}},
+  {id:'inr',name:'INR / TP',abbr:'INR',cat:'hemostasia',sub:'Coagulação',unit:'',step:'0.1',sexDep:false,desc:'Via extrínseca da coagulação e síntese hepática.',altClin:'↑ anticoagulação, hepatopatia, def. vitamina K',related:['Albumina','plaquetas'],exRel:'Sem efeito típico do exercício.',condText:'INR elevado aumenta risco hemorrágico e limita exercício.',ct:'a',refDisplay:_=>'0,8–1,2',ev:(v)=>{if(v<=1.2)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<=2.0)return{c:'a',st:'Levemente aumentado',cd:'Com restrição — evitar trauma.',tip:''};if(v<=3.5)return{c:'a',st:'Aumentado',cd:'Com restrição.',tip:''};return{c:'x',st:'Muito aumentado',cd:'Contraindicado — alto risco hemorrágico.',tip:''}}},
+  {id:'glic',name:'Glicemia',abbr:'Glic',cat:'glicidico',sub:'Glicídico',unit:'mg/dL',step:'1',sexDep:false,desc:'Principal marcador da homeostase glicêmica.',altClin:'↑ diabetes, estresse, corticoide | ↓ hipoglicemia',related:['HbA1c','insulina','cetonas'],exRel:'Exercício geralmente reduz a glicemia.',condText:'< 70 ou hiperglicemia importante exigem adiamento.',ct:'m',refDisplay:_=>'Jejum: 70–99 mg/dL',ev:(v)=>{if(v<70)return{c:'x',st:'Hipoglicemia',cd:'Contraindicado — corrigir antes.',tip:'Risco de perda de consciência.'};if(v<130)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};if(v<250)return{c:'a',st:'Hiperglicemia moderada',cd:'Com restrição.',tip:''};if(v<300)return{c:'a',st:'Hiperglicemia importante',cd:'Com restrição — adiar.',tip:''};return{c:'x',st:'Hiperglicemia grave',cd:'Contraindicado.',tip:''}}},
+  {id:'ferr',name:'Ferritina',abbr:'Ferr',cat:'ferro',sub:'Metabolismo do ferro',unit:'ng/mL',step:'1',sexDep:true,desc:'Proteína de armazenamento de ferro; reagente de fase aguda.',altClin:'↑ inflamação, neoplasias | ↓ deficiência de ferro, queda de VO₂máx',related:['Ferro sérico','saturação de transferrina','PCR','Hb'],exRel:'Atletas endurance podem ter ferritina reduzida; inflamação pode mascarar deficiência.',condText:'Baixa com sintomas → cautela e correção antes de progressão.',ct:'a',refDisplay:s=>s==='M'?'30–400 ng/mL':'15–150 (pré) | 30–400 (pós)',ev:(v,s)=>{const lo=s==='M'?30:15;if(v<lo)return{c:'a',st:'Ferritina baixa',cd:'Com restrição se sintomático.',tip:''};if(v<500)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Elevada — investigar',cd:'Não contraindica isoladamente.',tip:'Pode ser reagente de fase aguda.'}}},
+  {id:'vitd',name:'Vitamina D (25-OH)',abbr:'Vit D',cat:'vitaminas',sub:'Vitaminas',unit:'ng/mL',step:'0.5',sexDep:false,desc:'Marcador do estoque corporal de vitamina D.',altClin:'↑ suplementação excessiva | ↓ deficiência, baixa exposição solar',related:['Cálcio','fósforo','PTH'],exRel:'Níveis adequados favorecem função muscular.',condText:'Déficit importante pede correção; não contraindica isoladamente.',ct:'ok',refDisplay:_=>'20–60 ng/mL',ev:(v)=>{if(v<10)return{c:'a',st:'Deficiência grave',cd:'Com restrição — função muscular comprometida.',tip:''};if(v<20)return{c:'a',st:'Deficiência',cd:'Indicado com cautela — repor.',tip:''};if(v<=60)return{c:'ok',st:'Normal',cd:'Indicado.',tip:''};return{c:'a',st:'Possivelmente elevada',cd:'Investigar suplementação excessiva.',tip:''}}}
 ];
 
-const CATS_WITH_EX = CATS_META.map(c=>({...c,exams:EX.filter(e=>e.cat===c.id)})).filter(c=>c.exams.length>0);
+const CATS_WITH_EX=CATS_META.map(c=>({...c,exams:EX.filter(e=>e.cat===c.id)})).filter(c=>c.exams.length>0);
 
-// ─── Estado ──────────────────────────────────────────────────────────────────
-let st = {
-  screen:'patients', patients:[], currentPac:null, form:null,
-  tab:'eval', refSc:'cats', refCat:null, refExam:null, accOpen:null, q:''
+let st={
+  screen:'patients',
+  patients:[],
+  currentPac:null,
+  form:null,
+  tab:'ref',
+  refSc:'cats',refCat:null,refExam:null,
+  accOpen:null,q:''
 };
 
-// ─── Firestore ───────────────────────────────────────────────────────────────
-function initFirestore() {
-  db.collection('patients').orderBy('criadoEm','asc').onSnapshot(snap => {
-    st.patients = snap.docs.map(d => ({...d.data(), id: d.id}));
-    if (st.currentPac) {
-      const updated = st.patients.find(p => p.id === st.currentPac.id);
-      if (updated) st.currentPac = updated;
-    }
-    render();
-  }, err => { console.error('Firestore:', err); render(); });
-}
+function uid(){return'p_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-async function savePacToDb(pac) {
-  try {
-    const {id, ...data} = pac;
-    await db.collection('patients').doc(id).set({...data, atualizadoEm: new Date().toISOString()});
-  } catch(e) { console.error('Save:', e); }
+async function loadPacs(){
+  try{const r=await window.storage.get(STORAGE_KEY);if(r)st.patients=JSON.parse(r.value);}catch(e){st.patients=[];}
+  render();
 }
+async function savePacs(){try{await window.storage.set(STORAGE_KEY,JSON.stringify(st.patients));}catch(e){}}
 
-async function deletePacFromDb(id) {
-  try { await db.collection('patients').doc(id).delete(); }
-  catch(e) { console.error('Delete:', e); }
+function calcAge(dob){
+  if(!dob)return null;
+  try{const d=new Date(dob+'T00:00:00'),t=new Date();let a=t.getFullYear()-d.getFullYear();const m=t.getMonth()-d.getMonth();if(m<0||(m===0&&t.getDate()<d.getDate()))a--;return a<0?null:a;}catch(e){return null;}
 }
+function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
+function initials(nome){return nome.trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'?';}
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function uid() { return 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2,5); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function calcAge(dob) {
-  if(!dob) return null;
-  try { const d=new Date(dob+'T00:00:00'),t=new Date(); let a=t.getFullYear()-d.getFullYear(); const m=t.getMonth()-d.getMonth(); if(m<0||(m===0&&t.getDate()<d.getDate()))a--; return a<0?null:a; } catch(e){return null;}
-}
-function fmtDate(s) { if(!s) return '—'; const[y,m,d]=s.split('-'); return `${d}/${m}/${y}`; }
-function initials(n) { return n.trim().split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'?'; }
-function refStr(e,sex) { return typeof e.refD==='function' ? e.refD(sex) : e.refD; }
-function evExam(exam,val,sex) {
-  if(exam.binary){ return exam.ev(val==='1'?1:0,sex); }
+function evExam(exam,val,sex){
+  if(exam.binary){return exam.ev(val==='1'?1:0,sex);}
   const v=parseFloat(String(val).replace(',','.'));
-  if(isNaN(v)) return null;
+  if(isNaN(v))return null;
   return exam.ev(v,sex);
 }
-function overallCt(entries,sex) {
+function refStr(exam,sex){return typeof exam.refDisplay==='function'?exam.refDisplay(sex):exam.refDisplay;}
+function overallCt(entries,sex){
   const rs=Object.keys(entries).map(id=>{const ex=EX.find(e=>e.id===id);return ex?evExam(ex,entries[id],sex):null;}).filter(Boolean);
-  if(rs.some(r=>r.c==='x')) return 'x';
-  if(rs.some(r=>r.c==='a')) return 'a';
-  if(rs.length>0) return 'ok';
-  return null;
+  if(rs.some(r=>r.c==='x'))return'x';if(rs.some(r=>r.c==='a'))return'a';if(rs.length>0)return'ok';return null;
 }
 
-// ─── Render ───────────────────────────────────────────────────────────────────
-function render() { document.getElementById('root').innerHTML = buildApp(); }
+function render(){document.getElementById('root').innerHTML=buildApp();}
 
-function buildApp() {
+function buildApp(){
   if(st.screen==='patients') return buildPatientList();
   if(st.screen==='form') return buildForm();
   if(st.screen==='patientView') return buildPatientView();
   return '';
 }
 
-function buildPatientList() {
-  const pacs = st.patients;
-  return `<div class="hdr">
+function buildPatientList(){
+  const pacs=st.patients;
+// Volte para isso aqui:
+  return`<div class="hdr">
     <div class="hdr-row">
-      <div class="hdr-left"><h1>Pacientes</h1><p>EF Hospitalar · SUS</p></div>
-      <button class="icon-btn primary" onclick="openForm(null)"><i class="ti ti-plus"></i> Nova</button>
+      <div class="hdr-left"><h1>Pacientes</h1><p>Educação Física· SUS</p></div>
+      <button class="icon-btn primary" onclick="openForm(null)"><i class="ti ti-plus" aria-hidden="true"></i> Nova</button>
     </div>
   </div>
   <div class="content" style="padding-bottom:20px">
-    ${!pacs.length
-      ? `<div class="empty"><i class="ti ti-users"></i><p>Nenhuma paciente cadastrada.</p>
-         <p style="margin-top:12px"><button class="icon-btn primary" onclick="openForm(null)" style="margin:0 auto"><i class="ti ti-plus"></i> Cadastrar primeira paciente</button></p></div>`
-      : pacs.map(p => {
-          const age = calcAge(p.dataNasc);
-          const numEx = Object.keys(p.entries||{}).length;
-          const ct = numEx ? overallCt(p.entries, p.sexo||'F') : null;
-          const exTag = numEx ? `<span class="tag ex ${ct?'ex-'+ct:''}">${{x:'🔴',a:'🟡',ok:'🟢'}[ct]||''} ${numEx} exame${numEx>1?'s':''}</span>` : '';
-          return `<div class="pac-card" onclick="openPac('${p.id}')">
-            <div class="pac-av">${esc(initials(p.nome))}</div>
-            <div style="flex:1;min-width:0">
-              <div class="pac-nome">${esc(p.nome)}</div>
-              <div class="pac-info">${age!==null?age+' anos':fmtDate(p.dataNasc)}${p.diagnostico?' · '+p.diagnostico.split('\n')[0].substring(0,40):''}</div>
-              <div class="pac-tags">${p.gestacao?`<span class="tag gest">🤰 ${esc(p.gestacao)}</span>`:''}${exTag}</div>
-            </div>
-            <i class="ti ti-chevron-right" style="color:var(--t3);font-size:18px"></i>
-          </div>`;
-        }).join('')}
+    ${!pacs.length?`<div class="empty"><i class="ti ti-users" aria-hidden="true"></i><p>Nenhuma paciente cadastrada.</p><p style="margin-top:8px"><button class="icon-btn primary" onclick="openForm(null)" style="margin:0 auto"><i class="ti ti-plus" aria-hidden="true"></i> Cadastrar primeira paciente</button></p></div>`
+    :pacs.map(p=>{
+      const age=calcAge(p.dataNasc);
+      const numEx=Object.keys(p.entries||{}).length;
+      const ct=numEx?overallCt(p.entries,p.sexo):null;
+      const ctDot={x:'🔴',a:'🟡',ok:'🟢'}[ct]||'';
+      return`<div class="pac-card" onclick="openPac('${p.id}')">
+        <div class="pac-avatar">${esc(initials(p.nome))}</div>
+        <div style="flex:1;min-width:0">
+          <div class="pac-nome">${esc(p.nome)}</div>
+          <div class="pac-info">${age!==null?age+' anos':fmtDate(p.dataNasc)}${p.diagnostico?' · '+p.diagnostico.split('\n')[0].substring(0,35)+(p.diagnostico.length>35?'…':''):''}</div>
+          <div class="pac-tags">
+            ${p.gestacao?`<span class="tag gest">🤰 ${esc(p.gestacao)}</span>`:''}
+            ${numEx?`<span class="tag exames">${ctDot} ${numEx} exame${numEx>1?'s':''}</span>`:''}
+          </div>
+        </div>
+        <i class="ti ti-chevron-right" style="color:var(--color-text-tertiary);font-size:16px" aria-hidden="true"></i>
+      </div>`;
+    }).join('')}
   </div>`;
 }
 
-function buildForm() {
-  const f = st.form; const isEdit = !!(f&&f.id);
-  return `<div class="hdr">
+function buildForm(){
+  const f=st.form;const isEdit=!!(f&&f.id);
+  return`<div class="hdr">
     <div class="hdr-row">
-      <button class="back-btn" onclick="cancelForm()"><i class="ti ti-arrow-left"></i></button>
+      <button class="back-btn" onclick="cancelForm()"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
       <div class="hdr-left"><h1>${isEdit?'Editar paciente':'Nova paciente'}</h1></div>
     </div>
   </div>
   <div class="content" style="padding-bottom:20px">
-    <div class="form-sec">
+    <div class="form-section">
       <h2>Identificação</h2>
-      <div class="field"><label>Nome completo *</label><input type="text" id="f_nome" value="${esc(f?.nome||'')}" placeholder="Nome da paciente" oninput="fv('nome',this.value)" autocomplete="off" autocorrect="off" /></div>
-      <div class="field"><label>Data de nascimento</label><input type="date" id="f_dob" value="${esc(f?.dataNasc||'')}" oninput="fv('dataNasc',this.value)" /></div>
-      <div class="field"><label>Sexo biológico</label>
+      <div class="field">
+        <label>Nome completo *</label>
+        <input type="text" id="f_nome" value="${esc(f?.nome||'')}" placeholder="Nome da paciente" oninput="fv('nome',this.value)" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label>Data de nascimento</label>
+        <input type="date" id="f_dob" value="${esc(f?.dataNasc||'')}" oninput="fv('dataNasc',this.value)" />
+      </div>
+      <div class="field">
+        <label>Sexo biológico</label>
         <div class="sex-wrap">
           <button class="sex-btn ${f?.sexo!=='M'?'on':''}" onclick="fv('sexo','F')">Feminino</button>
           <button class="sex-btn ${f?.sexo==='M'?'on':''}" onclick="fv('sexo','M')">Masculino</button>
         </div>
       </div>
     </div>
-    <div class="form-sec">
+    <div class="form-section">
       <h2>Dados clínicos</h2>
-      <div class="field"><label>Semanas de gestação</label><input type="text" id="f_gest" value="${esc(f?.gestacao||'')}" placeholder="Ex.: 28 semanas (opcional)" oninput="fv('gestacao',this.value)" autocomplete="off" /><div class="field-hint">Deixe em branco se não gestante.</div></div>
-      <div class="field"><label>Diagnóstico prévio</label><textarea id="f_diag" placeholder="Ex.: ICC, DM2, HAS..." oninput="fv('diagnostico',this.value)">${esc(f?.diagnostico||'')}</textarea></div>
+      <div class="field">
+        <label>Semanas de gestação</label>
+        <input type="text" id="f_gest" value="${esc(f?.gestacao||'')}" placeholder="Ex.: 28 semanas (opcional)" oninput="fv('gestacao',this.value)" autocomplete="off" />
+        <div class="field-hint">Deixe em branco se não gestante.</div>
+      </div>
+      <div class="field">
+        <label>Diagnóstico prévio</label>
+        <textarea id="f_diag" placeholder="Ex.: ICC, DM2, HAS..." oninput="fv('diagnostico',this.value)">${esc(f?.diagnostico||'')}</textarea>
+      </div>
     </div>
-    <button class="save-btn" onclick="savePac()"><i class="ti ti-check"></i>${isEdit?'Salvar alterações':'Cadastrar paciente'}</button>
-    ${isEdit?`<button class="del-btn" onclick="deletePac('${f.id}')"><i class="ti ti-trash"></i>Excluir paciente</button>`:''}
+    <button class="save-btn" onclick="savePac()"><i class="ti ti-check" aria-hidden="true"></i>${isEdit?'Salvar alterações':'Cadastrar paciente'}</button>
+    ${isEdit?`<button class="del-btn" onclick="deletePac('${f.id}')"><i class="ti ti-trash" aria-hidden="true"></i>Excluir paciente</button>`:''}
   </div>`;
 }
 
-function buildPatientView() {
-  const p = st.currentPac; if(!p) return '';
-  const age = calcAge(p.dataNasc);
-  const sub = [age!==null?age+' anos':'', p.gestacao?'🤰 '+p.gestacao:''].filter(Boolean).join(' · ');
-  const nEx = Object.keys(p.entries||{}).length;
-  return `<div class="hdr">
+function buildPatientView(){
+  const p=st.currentPac;if(!p)return'';
+  const age=calcAge(p.dataNasc);
+  const sub=[age!==null?age+' anos':'',p.gestacao?'🤰 '+p.gestacao:''].filter(Boolean).join(' · ');
+  return`<div class="hdr">
     <div class="hdr-row">
-      <button class="back-btn" onclick="closePac()"><i class="ti ti-arrow-left"></i></button>
+      <button class="back-btn" onclick="closePac()"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
       <div class="hdr-left"><h1>${esc(p.nome)}</h1>${sub?`<p>${esc(sub)}</p>`:''}</div>
-      <button class="icon-btn" onclick="openForm('${p.id}')" style="padding:7px 11px"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn" onclick="openForm('${p.id}')" style="padding:6px 10px"><i class="ti ti-edit" aria-hidden="true"></i></button>
     </div>
-    ${(st.tab==='ref'&&st.refSc==='cats')||st.tab==='eval'?`<div class="search-wrap"><i class="ti ti-search si"></i>
+    ${st.tab==='ref'&&st.refSc==='cats'||st.tab==='eval'?`<div class="search-wrap"><i class="ti ti-search si" aria-hidden="true"></i>
       <input type="text" placeholder="${st.tab==='eval'?'Buscar exame para adicionar...':'Buscar exame ou categoria...'}" value="${esc(st.q)}" oninput="setQ(this.value)" />
-      ${st.q?`<button class="sc" onclick="setQ('')"><i class="ti ti-x"></i></button>`:''}
+      ${st.q?`<button class="sc" onclick="setQ('')"><i class="ti ti-x" aria-hidden="true"></i></button>`:''}
     </div>`:''}
   </div>
   <div class="content">${buildPacContent(p)}</div>
   <div class="nav">
-    ${[{id:'ref',ic:'ti-book-2',lbl:'Referência'},{id:'eval',ic:'ti-pencil-plus',lbl:'Avaliar'+(nEx?' ('+nEx+')':'')},{id:'conduta',ic:'ti-clipboard-check',lbl:'Conduta'}]
-      .map(t=>`<button class="nav-btn ${st.tab===t.id?'on':''}" onclick="setTab('${t.id}')"><i class="ti ${t.ic}"></i>${esc(t.lbl)}</button>`).join('')}
+    ${[{id:'ref',ic:'ti-book-2',lbl:'Referência'},{id:'eval',ic:'ti-pencil-plus',lbl:`Avaliar${Object.keys(p.entries||{}).length?' ('+Object.keys(p.entries||{}).length+')':''}`},{id:'conduta',ic:'ti-clipboard-check',lbl:'Conduta'}]
+    .map(t=>`<button class="nav-btn ${st.tab===t.id?'on':''}" onclick="setTab('${t.id}')"><i class="ti ${t.ic}" aria-hidden="true"></i>${esc(t.lbl)}</button>`).join('')}
   </div>`;
 }
 
-function buildPacContent(p) {
-  if(st.tab==='ref') {
+function buildPacContent(p){
+  if(st.tab==='ref'){
     if(st.q.trim()) return buildRefSearch(p);
     if(st.refSc==='cats') return buildRefCats();
     if(st.refSc==='catExams') return buildRefCatExams();
@@ -431,151 +391,162 @@ function buildPacContent(p) {
   return '';
 }
 
-function buildRefSearch(p) {
+function buildRefSearch(p){
   const q=st.q.toLowerCase();
   const res=EX.filter(e=>e.name.toLowerCase().includes(q)||e.abbr.toLowerCase().includes(q)||e.cat.toLowerCase().includes(q));
-  if(!res.length) return `<div class="empty"><i class="ti ti-search"></i>Nenhum resultado para "${esc(st.q)}"</div>`;
-  return `<div class="sec-hdr">${res.length} resultado(s)</div>`+res.map(e=>examListItem(e)).join('');
+  if(!res.length)return`<div class="empty"><i class="ti ti-search" aria-hidden="true"></i>Nenhum resultado</div>`;
+  let html=`<div style="font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px">${res.length} resultado(s)</div>`;
+  res.forEach(e=>{html+=examListItem(e);});return html;
 }
-function buildRefCats() {
-  return '<div class="cat-grid">'+CATS_WITH_EX.map(c=>`<div class="cat-card" onclick="openCat('${c.id}')"><div class="cat-icon" style="background:${c.bg}">${c.icon}</div><div class="cat-name">${esc(c.name)}</div><div class="cat-cnt">${c.exams.length} exames</div></div>`).join('')+'</div>';
+function buildRefCats(){
+  return'<div class="cat-grid">'+CATS_WITH_EX.map(c=>`<div class="cat-card" onclick="openCat('${c.id}')"><div class="cat-icon" style="background:${c.bg}">${c.icon}</div><div class="cat-name">${esc(c.name)}</div><div class="cat-cnt">${c.exams.length} exames</div></div>`).join('')+'</div>';
 }
-function buildRefCatExams() {
+function buildRefCatExams(){
   return EX.filter(e=>e.cat===st.refCat).map(e=>examListItem(e)).join('');
 }
-function examListItem(e) {
+function examListItem(e){
   const cl={x:'bx',a:'ba',ok:'bok',m:'bm'}[e.ct]||'bm';
   const lbl={x:'Contraindicado',a:'Com restrição',ok:'Indicado',m:'Verificar'}[e.ct]||'—';
-  return `<div class="eli" onclick="openExam('${e.id}')"><div><div class="eli-name">${esc(e.name)}</div><div class="eli-sub">${esc(e.sub)}</div></div><span class="badge ${cl}">${lbl}</span></div>`;
+  return`<div class="eli" onclick="openExam('${e.id}')"><div><div class="eli-name">${esc(e.name)}</div><div class="eli-sub">${esc(e.sub)}</div></div><span class="badge ${cl}">${lbl}</span></div>`;
 }
-function buildExamDetail(p) {
-  const e=st.refExam; if(!e) return '';
-  const sex=p.sexo||'F'; const isAdded=(p.entries||{})[e.id]!==undefined;
+function buildExamDetail(p){
+  const e=st.refExam;if(!e)return'';
+  const sex=p.sexo||'F';const isAdded=(p.entries||{})[e.id]!==undefined;
   const cc={x:'x',a:'a',ok:'ok',m:'m'};
-  return `<div class="det-sec"><div class="det-lbl">Descrição fisiológica</div><div class="det-val">${esc(e.desc)}</div></div>
-  <div class="det-sec"><div class="det-lbl">Valores de referência</div><div class="ref-box">${esc(refStr(e,sex))}</div></div>
-  <div class="det-sec"><div class="det-lbl">Alterações clínicas</div><div class="det-val">${esc(e.altClin)}</div></div>
-  <div class="det-sec"><div class="det-lbl">Avaliar em conjunto com</div><div class="chips">${e.related.map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div></div>
-  <div class="det-sec"><div class="det-lbl">Relação com exercício físico</div><div class="det-val">${esc(e.exRel)}</div></div>
-  <div class="det-sec"><div class="det-lbl">Conduta clínica</div><div class="cond-box ${cc[e.ct]||'m'}">${esc(e.condText)}</div></div>
-  <button class="add-to-eval ${isAdded?'added':''}" ${isAdded?'':'onclick="addAndGoEval(\''+e.id+'\')"'}>
-    <i class="ti ${isAdded?'ti-check':'ti-circle-plus'}"></i>${isAdded?'Já adicionado à avaliação':'Adicionar à avaliação'}
+  return`
+  <div class="det-section"><div class="det-lbl">Descrição fisiológica</div><div class="det-val">${esc(e.desc)}</div></div>
+  <div class="det-section"><div class="det-lbl">Valores de referência</div><div class="ref-box">${esc(refStr(e,sex))}</div></div>
+  <div class="det-section"><div class="det-lbl">Alterações clínicas</div><div class="det-val">${esc(e.altClin)}</div></div>
+  <div class="det-section"><div class="det-lbl">Avaliar em conjunto com</div><div class="chips">${e.related.map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div></div>
+  <div class="det-section"><div class="det-lbl">Relação com exercício físico</div><div class="det-val">${esc(e.exRel)}</div></div>
+  <div class="det-section"><div class="det-lbl">Conduta clínica</div><div class="cond-box ${cc[e.ct]||'m'}">${esc(e.condText)}</div></div>
+  <button class="add-to-eval-btn ${isAdded?'added':''}" ${isAdded?'':'onclick="addAndGoEval(\''+e.id+'\')"'}>
+    <i class="ti ${isAdded?'ti-check':'ti-circle-plus'}" aria-hidden="true"></i>${isAdded?'Já adicionado à avaliação':'Adicionar à avaliação'}
   </button>`;
 }
 
-function buildEvalTab(p) {
-  const sex=p.sexo||'F'; const entries=p.entries||{};
+function buildEvalTab(p){
+  const sex=p.sexo||'F';const entries=p.entries||{};
   const added=EX.filter(e=>entries[e.id]!==undefined);
   let html='';
-  if(p.diagnostico||p.gestacao) {
-    html+=`<div class="pac-info-bar"><strong>${esc(p.nome)}</strong>${calcAge(p.dataNasc)?' · '+calcAge(p.dataNasc)+' anos':''}${p.gestacao?' · 🤰 '+p.gestacao:''}<br><span style="color:var(--t3)">${esc((p.diagnostico||'').split('\n')[0])}</span></div>`;
+  if(p.diagnostico){
+    html+=`<div class="pac-info-bar"><strong>${esc(p.nome)}</strong>${calcAge(p.dataNasc)?' · '+calcAge(p.dataNasc)+' anos':''}${p.gestacao?' · 🤰 '+p.gestacao:''}<br><span style="color:var(--color-text-tertiary)">${esc(p.diagnostico.split('\n')[0])}</span></div>`;
   }
-  if(st.q.trim()) {
+  if(st.q.trim()){
     const q=st.q.toLowerCase();
     const res=EX.filter(e=>e.name.toLowerCase().includes(q)||e.abbr.toLowerCase().includes(q));
-    if(!res.length){html+=`<div class="empty" style="padding:28px 0"><i class="ti ti-search"></i>Nenhum resultado</div>`;}
-    else {
-      html+=`<div class="sec-hdr">Toque em + para adicionar</div>`;
-      res.forEach(e=>{const isAdded=entries[e.id]!==undefined;html+=`<div class="search-result-row"><div><div style="font-size:13px;font-weight:600;color:var(--t1)">${esc(e.name)}</div><div style="font-size:11px;color:var(--t3)">${esc(CATS_META.find(c=>c.id===e.cat)?.name||'')} · ${esc(e.unit)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}"></i></button></div>`;});
+    if(!res.length){html+=`<div class="empty" style="padding:28px 0"><i class="ti ti-search" aria-hidden="true"></i>Nenhum resultado</div>`;}
+    else{
+      html+=`<div style="font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px">Toque em + para adicionar</div>`;
+      res.forEach(e=>{const isAdded=entries[e.id]!==undefined;html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:7px"><div><div style="font-size:13px;font-weight:500">${esc(e.name)}</div><div style="font-size:11px;color:var(--color-text-tertiary)">${esc(CATS_META.find(c=>c.id===e.cat)?.name||e.cat)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i></button></div>`;});
     }
-    if(added.length) html+=`<div style="margin-top:12px"><div class="sec-hdr">Inseridos (${added.length})</div>${added.map(e=>buildExCard(e,entries,sex)).join('')}</div>`;
+    if(added.length)html+=`<div style="margin-top:10px"><div class="sec-hdr">Inseridos (${added.length})</div>${added.map(e=>buildExCard(e,entries,sex)).join('')}</div>`;
     return html;
   }
-  if(added.length) {
-    html+=`<div class="eval-added-section"><div class="sec-hdr">Exames inseridos (${added.length}) <a onclick="setTab('conduta')">Ver conduta →</a></div>${added.map(e=>buildExCard(e,entries,sex)).join('')}</div>`;
-  }
+  if(added.length){html+=`<div class="eval-added-section"><div class="sec-hdr">Exames inseridos (${added.length}) <span style="font-size:11px;color:var(--color-text-info);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0" onclick="setTab('conduta')">Ver conduta →</span></div>${added.map(e=>buildExCard(e,entries,sex)).join('')}</div>`;}
   html+=`<div class="sec-hdr" style="margin-top:${added.length?'4px':'0'}">Adicionar exames</div>`;
   CATS_WITH_EX.forEach(c=>{
     const isOpen=st.accOpen===c.id;
     const catAdded=c.exams.filter(e=>entries[e.id]!==undefined).length;
-    html+=`<div class="acc-cat"><div class="acc-hdr" onclick="toggleAcc('${c.id}')">
-      <div class="acc-title">${c.icon} ${esc(c.name)} <span class="acc-cnt">${c.exams.length} exames${catAdded?' · '+catAdded+' ✓':''}</span></div>
-      <i class="ti ti-chevron-down acc-chev ${isOpen?'open':''}"></i></div>
-      ${isOpen?`<div class="acc-body">${c.exams.map(e=>{const isAdded=entries[e.id]!==undefined;return`<div class="aer"><div><div class="aer-name">${esc(e.name)}</div><div class="aer-unit">${esc(e.unit)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}"></i></button></div>`;}).join('')}</div>`:''}</div>`;
+    html+=`<div class="acc-cat"><div class="acc-hdr" onclick="toggleAcc('${c.id}')"><div class="acc-title">${c.icon} ${esc(c.name)} <span class="acc-cnt">${c.exams.length} exames${catAdded?' · '+catAdded+' ✓':''}</span></div><i class="ti ti-chevron-down acc-chev ${isOpen?'open':''}" aria-hidden="true"></i></div>
+    ${isOpen?`<div class="acc-body">${c.exams.map(e=>{const isAdded=entries[e.id]!==undefined;return`<div class="aer"><div><div class="aer-name">${esc(e.name)}</div><div class="aer-unit">${esc(e.unit)}</div></div><button class="add-btn ${isAdded?'chk':''}" ${isAdded?'disabled':'onclick="addExam(\''+e.id+'\')"'}><i class="ti ${isAdded?'ti-check':'ti-plus'}" aria-hidden="true"></i></button></div>`;}).join('')}</div>`:''}</div>`;
   });
   return html;
 }
 
-function buildExCard(e,entries,sex) {
-  const val=entries[e.id]||''; const res=val!==''?evExam(e,val,sex):null; const c=res?res.c:'';
+function buildExCard(e,entries,sex){
+  const val=entries[e.id]||'';const res=val!==''?evExam(e,val,sex):null;const c=res?res.c:'';
   let inputHtml;
-  if(e.binary) {
-    inputHtml=`<div class="ex-inp-row"><div class="sex-wrap" style="gap:6px">
-      <button class="sex-btn ${!val||val==='0'?'on':''}" onclick="setVal('${e.id}','0')">Normal</button>
-      <button class="sex-btn ${val==='1'?'on':''}" style="${val==='1'?'border-color:var(--td);background:var(--bgd);color:var(--td)':''}" onclick="setVal('${e.id}','1')">Elevada</button>
-    </div></div>`;
+  if(e.binary){
+    inputHtml=`<div class="ex-inp-row"><div class="sex-wrap" style="gap:5px"><button class="sex-btn ${!val||val==='0'?'on':''}" onclick="setVal('${e.id}','0')">Normal</button><button class="sex-btn ${val==='1'?'on':''}" style="${val==='1'?'border-color:var(--color-text-danger);background:var(--color-background-danger);color:var(--color-text-danger)':''}" onclick="setVal('${e.id}','1')">Elevada</button></div></div>`;
   } else {
-    inputHtml=`<div class="ex-inp-row"><input type="number" step="${e.step||'any'}" inputmode="decimal" placeholder="—" value="${esc(val)}" oninput="setVal('${e.id}',this.value)" /><span class="ex-unit">${esc(e.unit)}</span></div>`;
+	inputHtml=`<div class="ex-inp-row"><input type="number" step="${e.step||'any'}" inputmode="decimal" placeholder="—" value="${esc(val)}" onchange="setVal('${e.id}',this.value)" /><span class="ex-unit">${esc(e.unit)}</span></div>`;
   }
-  return `<div class="ex-card"><div class="ex-card-hd"><div><div class="ex-name">${esc(e.name)}</div><div class="ex-sub">${esc(CATS_META.find(cm=>cm.id===e.cat)?.name||e.cat)}</div></div>
-    <button class="rm-btn" onclick="removeExam('${e.id}')"><i class="ti ti-x"></i></button></div>
-    ${inputHtml}<div class="ex-ref">VR: ${esc(refStr(e,sex))}</div>
-    ${res?`<div class="cstrip ${c}"><div class="cst"><i class="ti ${c==='x'?'ti-circle-x':c==='a'?'ti-alert-triangle':'ti-circle-check'}"></i>${esc(res.st)}</div><div class="ccd">${esc(res.cd)}</div></div>${res.tip?`<div class="ctip">${esc(res.tip)}</div>`:''}`:''}
+  return`<div class="ex-card"><div class="ex-card-hd"><div><div class="ex-name">${esc(e.name)}</div><div class="ex-sub">${esc(CATS_META.find(cm=>cm.id===e.cat)?.name||e.cat)}</div></div><button class="rm-btn" onclick="removeExam('${e.id}')"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+  ${inputHtml}<div class="ex-ref">VR: ${esc(refStr(e,sex))}</div>
+  ${res?`<div class="cstrip ${c}"><div class="cst"><i class="ti ${c==='x'?'ti-circle-x':c==='a'?'ti-alert-triangle':'ti-circle-check'}" aria-hidden="true"></i>${esc(res.st)}</div><div class="ccd">${esc(res.cd)}</div></div>${res.tip?`<div class="tip">${esc(res.tip)}</div>`:''}`:''}
   </div>`;
 }
 
-function buildCondutaTab(p) {
-  const entries=p.entries||{}; const sex=p.sexo||'F';
+function buildCondutaTab(p){
+  const entries=p.entries||{};const sex=p.sexo||'F';
   const added=EX.filter(e=>entries[e.id]!==undefined);
-  if(!added.length) return `<div class="empty"><i class="ti ti-clipboard"></i><p>Nenhum exame inserido ainda.</p><p>Vá para a aba Avaliar.</p></div>`;
+  if(!added.length)return`<div class="empty"><i class="ti ti-clipboard" aria-hidden="true"></i>Nenhum exame inserido ainda.<br><span style="font-size:12px">Vá para a aba Avaliar.</span></div>`;
   const ct=overallCt(entries,sex)||'ok';
   const hi={x:{cls:'x',ic:'ti-circle-x',lbl:'Conduta geral',main:'Contraindicado'},a:{cls:'a',ic:'ti-alert-triangle',lbl:'Conduta geral',main:'Com restrição'},ok:{cls:'ok',ic:'ti-circle-check',lbl:'Conduta geral',main:'Indicado'}}[ct];
   let html=`<div class="pac-info-bar"><strong>${esc(p.nome)}</strong>${calcAge(p.dataNasc)?' · '+calcAge(p.dataNasc)+' anos':''}${p.gestacao?' · 🤰 '+p.gestacao:''}</div>`;
-  html+=`<div class="sum-hero ${hi.cls}"><div class="sh-lbl"><i class="ti ${hi.ic}" style="margin-right:4px"></i>${hi.lbl}</div><div class="sh-val">${hi.main}</div></div>`;
+  html+=`<div class="sum-hero ${hi.cls}"><div class="sh-lbl"><i class="ti ${hi.ic}" style="margin-right:4px" aria-hidden="true"></i>${hi.lbl}</div><div class="sh-val">${hi.main}</div></div>`;
   const groups={x:[],a:[],ok:[]};
   added.forEach(e=>{const val=entries[e.id];const res=val!==''?evExam(e,val,sex):null;const g=res?res.c:'ok';(groups[g]||groups['ok']).push({e,val,res});});
   ['x','a','ok'].forEach(g=>{groups[g].forEach(({e,val,res})=>{
     const vd=e.binary?(val==='1'?'Elevada':'Normal'):`${val} ${e.unit}`;
-    html+=`<div class="sum-row"><div class="sdot ${g}"></div><div style="flex:1"><div class="sr-nm">${esc(e.name)}</div><div class="sr-vl">${esc(vd)} · VR: ${esc(refStr(e,sex))}</div>${res?`<div class="sr-cd ${g}">${esc(res.cd)}</div>`:''}${res&&res.tip?`<div class="sr-tip">${esc(res.tip)}</div>`:''}</div></div>`;
+    html+=`<div class="sum-row"><div class="sdot ${g}"></div><div style="flex:1"><div class="sr-nm">${esc(e.name)}</div><div class="sr-vl">${esc(vd)} · VR: ${esc(refStr(e,sex))}</div>${res?`<div class="sr-cd ${g}">${esc(res.cd)}</div>`:''}</div></div>`;
   });});
-  html+=`<div class="disc"><i class="ti ti-info-circle" style="margin-right:4px"></i>Ferramenta de apoio à decisão clínica. O julgamento individualizado do profissional é insubstituível.</div>`;
+  html+=`<div class="disc"><i class="ti ti-info-circle" style="margin-right:4px" aria-hidden="true"></i>Ferramenta de apoio à decisão. O julgamento clínico individualizado é insubstituível.</div>`;
   return html;
 }
 
-// ─── Handlers ─────────────────────────────────────────────────────────────────
-function openForm(id) {
-  if(id===null){st.form={id:null,nome:'',dataNasc:'',sexo:'F',gestacao:'',diagnostico:'',entries:{}};}
-  else {const p=st.patients.find(x=>x.id===id)||st.currentPac; st.form=p?{...p}:null;}
-  st.screen='form'; render();
+// Event handlers
+function openForm(id){
+  if(id===null){
+    st.form={id:null,nome:'',dataNasc:'',sexo:'F',gestacao:'',diagnostico:'',entries:{}};
+  } else {
+    const p=st.patients.find(x=>x.id===id)||st.currentPac;
+    st.form=p?{...p}:null;
+  }
+  st.screen='form';render();
 }
-function cancelForm(){st.screen=st.currentPac?'patientView':'patients';st.form=null;render();}
-function fv(field,val){if(!st.form)return;st.form[field]=val;if(field==='sexo')render();}
+function cancelForm(){
+  st.screen=st.currentPac?'patientView':'patients';
+  st.form=null;render();
+}
+function fv(field,val){
+  if(!st.form)return;
+  st.form[field]=val;
+  const el=document.getElementById('f_'+{nome:'nome',dataNasc:'dob',gestacao:'gest',diagnostico:'diag',sexo:'sexo'}[field]);
+  if(field==='sexo'){render();return;}
+  // just update state without full re-render
+}
 function savePac(){
-  const f=st.form; if(!f||!f.nome.trim()){alert('Informe o nome da paciente.');return;}
+  const f=st.form;if(!f||!f.nome.trim()){alert('Informe o nome da paciente.');return;}
   if(f.id){
     const idx=st.patients.findIndex(p=>p.id===f.id);
-    const updated={...st.patients[idx],...f,atualizadoEm:new Date().toISOString()};
-    if(idx>=0) st.patients[idx]=updated;
-    if(st.currentPac&&st.currentPac.id===f.id) st.currentPac=updated;
-    savePacToDb(updated);
+    if(idx>=0){st.patients[idx]={...st.patients[idx],...f,atualizadoEm:new Date().toISOString()};}
+    if(st.currentPac&&st.currentPac.id===f.id)st.currentPac=st.patients[idx>=0?idx:0];
   } else {
     const np={...f,id:uid(),entries:{},criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString()};
-    st.patients.push(np); st.currentPac=np;
-    savePacToDb(np);
+    st.patients.unshift(np);st.currentPac=np;
   }
-  st.form=null; st.screen='patientView'; st.tab='eval'; st.refSc='cats'; render();
+  savePacs();st.form=null;st.screen=st.currentPac?'patientView':'patients';
+  st.tab='eval';st.refSc='cats';render();
 }
 function deletePac(id){
-  if(!confirm('Excluir esta paciente? Esta ação não pode ser desfeita.')) return;
-  deletePacFromDb(id);
+  if(!confirm('Excluir esta paciente? Esta ação não pode ser desfeita.'))return;
   st.patients=st.patients.filter(p=>p.id!==id);
-  st.currentPac=null; st.form=null; st.screen='patients'; render();
+  savePacs();st.currentPac=null;st.form=null;st.screen='patients';render();
 }
 function openPac(id){
-  const p=st.patients.find(x=>x.id===id); if(!p) return;
-  st.currentPac=p; st.screen='patientView'; st.tab='eval'; st.refSc='cats'; st.q=''; st.accOpen=null; render();
+  const p=st.patients.find(x=>x.id===id);if(!p)return;
+  st.currentPac=p;st.screen='patientView';st.tab='eval';st.refSc='cats';st.q='';st.accOpen=null;render();
 }
 function closePac(){st.screen='patients';st.currentPac=null;st.q='';render();}
 function setTab(t){st.tab=t;if(t!=='ref')st.q='';if(t==='eval')st.accOpen=null;render();}
 function setQ(v){st.q=v;render();}
 function openCat(id){st.refCat=id;st.refSc='catExams';render();}
 function openExam(id){const ex=EX.find(e=>e.id===id);if(ex){st.refExam=ex;st.refSc='examDetail';render();}}
-function goBack(){if(st.refSc==='examDetail')st.refSc='catExams';else if(st.refSc==='catExams'){st.refSc='cats';st.refCat=null;}render();}
+function goBack(){
+  if(st.refSc==='examDetail')st.refSc='catExams';
+  else if(st.refSc==='catExams'){st.refSc='cats';st.refCat=null;}
+  render();
+}
 function toggleAcc(id){st.accOpen=st.accOpen===id?null:id;render();}
 function addExam(id){
   if(!st.currentPac)return;
   if(!st.currentPac.entries)st.currentPac.entries={};
-  if(st.currentPac.entries[id]===undefined){st.currentPac.entries[id]='';syncAndSave();st.q='';render();}
+  if(st.currentPac.entries[id]===undefined){
+    st.currentPac.entries[id]='';
+    syncAndSave();st.q='';render();
+  }
 }
 function removeExam(id){
   if(!st.currentPac||!st.currentPac.entries)return;
@@ -590,15 +561,9 @@ function addAndGoEval(id){addExam(id);st.tab='eval';render();}
 function syncAndSave(){
   if(!st.currentPac)return;
   const idx=st.patients.findIndex(p=>p.id===st.currentPac.id);
-  if(idx>=0)st.patients[idx]=st.currentPac;
-  savePacToDb(st.currentPac);
+  if(idx>=0){st.patients[idx]=st.currentPac;st.patients[idx].atualizadoEm=new Date().toISOString();}
+  savePacs();
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
-if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW:', e));
-}
-initFirestore();
+loadPacs();
 </script>
-</body>
-</html>
